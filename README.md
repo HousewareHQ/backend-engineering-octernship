@@ -8,13 +8,16 @@ Houseware's vision is to empower the next generation of knowledge workers by put
 
 Houseware is changing the way the data warehouse is leveraged, and we want you to help build Houseware! Our team came together to answer the singular question, "how can we flip the value of the data warehouse to the ones who really need it, to the ones who drive decisions". 
 
-In this role, you'll have the opportunity to work as a Frontend engineer with the Houseware team on multiple customer-facing projects. You'd be involved with delivering the optimal user experience for the end user, while taking complete ownership of engineering challenges - this would include communicating with the stakeholders, setting the right expectations, and ensuring top quality for the code & the product being shipped.
+In this role, you'll have the opportunity to work as a Backend engineer with the Houseware team on multiple customer-facing projects, the role being intensive in technical architecture and backend engineering. The ability to have a constant pulse on the engineering team’s shipping velocity, while accounting for stability and technical debt looking forward is crucial.
 
 ### Octernship role description
 
-We're looking for frontend developers to join the Houseware team. 
+We're looking for backend developers to join the Houseware team. 
 
 We are hell-bent on building a forward-looking product, something that constantly pushes us to think by first principles and question assumptions, building a team that is agile in adapting and ever curious. While fast-paced execution is one of the prerequisites in this role, equally important is the ability to pause and take stock of where product/engineering is heading from a long-term perspective. Your initiative is another thing that we would expect to shine through here, as you continuously navigate through ambiguous waters while working with vigor on open-ended questions - all to solve problems for and empathize with the end users.
+
+You are expected to own the backend and infrastructure stack end-to-end, understand the business use cases, map it to the best-in-class engineering systems while maintaining a great developer experience. This role involves a high level of attention to detail, debugging and testing skills, as well as long-term thinking with respect to the scalability of our platform. 
+
 
 | Octernship info  | Timelines and Stipend |
 | ------------- | ------------- |
@@ -24,11 +27,11 @@ We are hell-bent on building a forward-looking product, something that constantl
 
 ### Recommended qualifications
 
-- You have a solid problem-solving framework.
-- You know Javascript and the Browser ecosystem very well; we love polyglot programmers and have services written in Go and Python.
-- We write React; Typescript, so we expect you to be well versed with React. If you have worked with Typescript or any typed language before, it's a plus.
+You’d be a great fit if:
 
-If you love to optimize web vitals, do SSR, have worked with Bundlers, and multi-threading in JS excites you, we can’t wait to talk.
+- You’re proficient in Golang and Python, having prior experience building backend systems and hands-on experience with AWS/GCP.
+- You’re familiar with the modern data stack and have a good understanding of Infrastructure-as-code tooling like Terraform.
+- Plus Points if you’re a contributor to open-source, we’d love to see your work!
 
 ### Eligibility
 
