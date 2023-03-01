@@ -45,15 +45,34 @@ To participate, you must be:
 
 # Assignment
 
-## TASK-TITLE
+## Implement an Authorization+Authentication service in Golang
 
 ### Task instructions
 
-&lt;!--- Use this section to describe the project that students are required to complete. We ask that you also include instructions on running and preparing the students' local environment if necessary. --->
+The assignment is to create a backend API service in Golang that handles authorization and authentication for a web app. The details of the web app are as follows:
+- RBAC(what are the roles(reader, writer, admin) and permissions), JWT(1 hour expiry)
+- login(username,password), logout, accessing resources should follow the given role
+- admin can do everything(read,edit,write,delete on users)
+- write can read,edit,write
+- read can read
+- POST,GET,PUT,DELETE on /users
+
+The API should follow REST API conventions, feel free to design the API structure as you may.
+
+Provided in this template is a Golang Standard repository, you'd have to choose and setup the relevant 
+- golang framework
+- ORM, 
+- database: hash your passwords
+- DB design 
+
+Note: Do add unit tests(for success & failure) on each endpoint.
+
+Do document the design decisions and the rationale behind the same in a README file.
 
 ### Task Expectations
 
-&lt;!--- Please add expectations that students need to follow to be considered. Some examples include: completing the project on their own, not using code from external resources without comprehending the logic, etc.  --->
+- Postman/Swagger to test
+- will be evaluated on: correctness of the APIs, simplicity, architecture of the solution
 
 ### Task submission
 
@@ -64,7 +83,3 @@ Students are expected to use the [GitHub Flow](https://docs.github.com/en/get-st
 2. Opening a Pull Request for review
 
 3. Using GitHub Discussions to ask any relevant questions regarding the project
-
-### Resources
-
-&lt;!--- Use this section to add resources for students to refer to. For example Documentation, Tutorials, Guides, and more.  --->
