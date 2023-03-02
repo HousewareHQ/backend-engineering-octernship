@@ -45,15 +45,44 @@ To participate, you must be:
 
 # Assignment
 
-## TASK-TITLE
+## Implement an Authorization+Authentication service in Golang
 
 ### Task instructions
 
-&lt;!--- Use this section to describe the project that students are required to complete. We ask that you also include instructions on running and preparing the students' local environment if necessary. --->
+The assignment is to create a backend API service in Golang that handles authorization and authentication for a web app. The details of the web app are as follows:
+- A simple web app where users in an organization can signin and list all other users in their organization
+- Logging in is performed by supplying a `username, password` combination
+- Note that all passwords should be hashed when stored in a database for security purposes
+- For simplicity, assume that the existing users have already been registered and we are not concerned about a user registration flow here.
+- The user should be logged in with a JWT token, that refreshes every one hour.
+- The user should be able to logout as well.
+- There are admin privileges assigned to a few users, which gives them the ability to add new user accounts or delete existing user accounts from their organization.
+- All non-admin users should be able to see other user accounts but shouldn't be able to add/delete any user accounts.
+- Note that any user shouldn't be able to view/add/delete user accounts into any other organization.
+
+The API should follow REST API conventions, feel free to design the API structure as you may. The API should cover the following functionalities:
+- User Login
+- User Logout
+- Admin User adds a new User account(by providing the username & password)
+- Admin User deletes an existing User account from their organization
+- List all Users in their organization
+
+Note: Do add unit tests(for success & failure) for each API endpoint.
+
+Provided in this Github template is a Golang Standard repository, you'd have to design an ideal architecture/stack for this problem
+- Golang framework for this API
+- Which Database shall be used to store the user details?
+- The ORM that shall be used for interfacing with the Database
+- DB design
+
+Do document the design decisions and the rationale behind the same in a README file.
+
 
 ### Task Expectations
 
-&lt;!--- Please add expectations that students need to follow to be considered. Some examples include: completing the project on their own, not using code from external resources without comprehending the logic, etc.  --->
+- Instructions in the Readme to setup the API & the relevant database
+- Postman/Swagger/OpenAPI spec so that the APIs can be tested
+- The task will be evaluated on the: fulfillment of the requirements and correctness of the API responses, in addition to the simplicity & architecture of the solution
 
 ### Task submission
 
@@ -64,7 +93,3 @@ Students are expected to use the [GitHub Flow](https://docs.github.com/en/get-st
 2. Opening a Pull Request for review
 
 3. Using GitHub Discussions to ask any relevant questions regarding the project
-
-### Resources
-
-&lt;!--- Use this section to add resources for students to refer to. For example Documentation, Tutorials, Guides, and more.  --->
