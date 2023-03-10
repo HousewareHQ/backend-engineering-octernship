@@ -54,7 +54,8 @@ The assignment is to create a backend API service in Golang that handles authori
 - Logging in is performed by supplying a `username, password` combination
 - Note that all passwords should be hashed when stored in a database for security purposes
 - For simplicity, assume that the existing users have already been registered and we are not concerned about a user registration flow here.
-- The user should be logged in with a JWT token, that refreshes every one hour.
+- The user should be logged in with a JWT token, with a one hour expiry.
+- The user should be able to receive a new access token using a 'Refresh token' with a validity of 24 hours.
 - The user should be able to logout as well.
 - There are admin privileges assigned to a few users, which gives them the ability to add new user accounts or delete existing user accounts from their organization.
 - All non-admin users should be able to see other user accounts but shouldn't be able to add/delete any user accounts.
