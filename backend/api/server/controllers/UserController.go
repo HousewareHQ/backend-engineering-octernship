@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -66,20 +68,74 @@ func Login() gin.HandlerFunc {
 
 func GetAllUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 
-		// //PAGINATION of records
-		// recordsPerPage, err := strconv.Atoi(ctx.Query("records-per-page"))
-		// if err != nil || recordsPerPage < 1 {
-		// 	recordsPerPage = 10 // a default of 10 records per page
-		// }
-		// page,pageErr := strconv.Atoi(ctx.Query("page"))
-		// if pageErr != nil || page <1{
-		// 	page =1
-		// }
+		//No Filter,all documents will be queried
+		filter := bson.D{}
+		//exclude password field
+		opts := options.Find().SetProjection(bson.D{{Key: "password", Value: 0}})
+		cursor, err := userCollection.Find(c, filter, opts)
+		defer cancel()
+		if err != nil {
+			log.Panic()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
-		// startIndex:= (page-1)*recordsPerPage
-		// startIndex,err :=
+		var results []models.User //storing result in user list
+		defer cancel()
+		if err = cursor.All(c, &results); err != nil {
+			log.Panic()
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, results)
+
+		//PAGINATION of records
+		// 	recordsPerPage, err := strconv.Atoi(ctx.Query("records-per-page"))
+		// 	if err != nil || recordsPerPage < 1 {
+		// 		recordsPerPage = 10 // a default of 10 records per page
+		// 	}
+		// 	page, pageErr := strconv.Atoi(ctx.Query("page"))
+		// 	if pageErr != nil || page < 1 {
+		// 		page = 1
+		// 	}
+
+		// 	startIndex := (page - 1) * recordsPerPage
+		// 	startIndex, err = strconv.Atoi(ctx.Query("start-index"))
+
+		// 	//Pipeline functions
+		// 	matchStage := bson.D{{"$match", bson.D{{}}}}
+		// 	//used like filter
+		// 	groupStage := bson.D{{"$group", bson.D{
+		// 		{"_id", bson.D{{"_id", "null"}}},
+		// 		{"totalcount", bson.D{{"$sum", 1}}},
+		// 		{"$data", bson.D{{"$push", "$$ROOT"}}},
+		// 	}}}
+		// 	projectStage := bson.D{
+		// 		{"$project", bson.D{
+		// 			{"_id", 0},
+		// 			{"totalcount", 1},
+		// 			{"user_items", bson.D{{"$slice", []interface{}{"$data", startIndex, recordsPerPage}}}},
+		// 		}},
+		// 	}
+		// 	result, err := userCollection.Aggregate(c, mongo.Pipeline{
+		// 		matchStage,
+		// 		groupStage,
+		// 		projectStage,
+		// 	})
+		// 	defer cancel()
+		// 	if err != nil {
+		// 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// 	}
+
+		// 	var allUsersList []bson.M
+		// 	if err = result.All(c, &allUsersList); err != nil {
+		// 		log.Fatal(err)
+		// 		return
+		// 	}
+		// 	ctx.JSON(http.StatusOK, allUsersList)
 
 	}
 }
