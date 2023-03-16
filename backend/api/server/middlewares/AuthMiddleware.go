@@ -31,6 +31,7 @@ func SessionAuthentication() gin.HandlerFunc {
 			//Try to use refresh token to issue new access token
 			storedRefreshToken, refreshTokenErr := ctx.Cookie("refreshtoken")
 			defer cancel()
+
 			if refreshTokenErr != nil {
 				//refresh token is not stored
 				//Suggesting client to relogin
@@ -58,9 +59,13 @@ func SessionAuthentication() gin.HandlerFunc {
 				ctx.Abort()
 				return
 			}
-			ctx.SetCookie("accesstoken", accessToken, int(AppConstant.TOKEN_EXPIRY), "/users", "localhost", false, true)
-			ctx.SetCookie("refreshtoken", refreshToken, int(AppConstant.REFRESH_TOKEN_EXPIRY), "/users", "localhost", false, true)
+
+			ctx.SetCookie("accesstoken", accessToken, int(AppConstant.TOKEN_COOKIE_EXPIRY), "/users", "localhost", false, true)
+			ctx.SetCookie("refreshtoken", refreshToken, int(AppConstant.REFRESH_TOKEN_COOKIE_EXPIRY), "/users", "localhost", false, true)
 			ctx.JSON(http.StatusAccepted, gin.H{"Ok": "Refreshed session"})
+			ctx.Set("accesstoken", accessToken)
+			ctx.Set("refreshtoken", refreshToken)
+			ctx.Next()
 
 		}
 
@@ -70,8 +75,23 @@ func SessionAuthentication() gin.HandlerFunc {
 func Authorization() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		// clientJwtToken := ctx.Request.Header.Get("token")
-		clientJwtToken, tokenAccessErr := ctx.Cookie("accesstoken")
+		//Either get accesstoken from previous context or current context's stored cookies*/
+		/*
+			If session is refreshed,then this middleware is also triggered
+			but as previous context does not contain new stored token cookies information
+			Hence,we will store new tokens in context using .Set() and then pass this context to next context
+			and that will be this middleware's context.
+			At the end we will check whether context.GetString("accesstoken") contains access token or not
+			if yes: then that wil be our token
+			else : this is new request and session is valid hence cookie contains valid tokens to be accessed and to proceed
+		*/
+		var clientJwtToken string
+		var tokenAccessErr error
+		if clientJwtToken = ctx.GetString("accesstoken"); clientJwtToken == "" {
+			clientJwtToken, tokenAccessErr = ctx.Cookie("accesstoken")
+
+		}
+		//clientJwtToken := ctx.Request.Header.Get("token") //TO GET TOKEN USING HEADER
 		if tokenAccessErr != nil { //If Fails to get access token from cookie:Suggest relogin
 			ctx.JSON(http.StatusForbidden, gin.H{"SessionExpired": tokenAccessErr.Error()})
 			ctx.Abort()
@@ -81,7 +101,7 @@ func Authorization() gin.HandlerFunc {
 		//Validate JWT token
 		claims, err := helpers.ValidateJWTToken(clientJwtToken)
 		if err != "" {
-			ctx.JSON(http.StatusConflict, gin.H{"error": err})
+			ctx.JSON(http.StatusConflict, gin.H{"TokenError": err})
 			ctx.Abort()
 			return
 		}

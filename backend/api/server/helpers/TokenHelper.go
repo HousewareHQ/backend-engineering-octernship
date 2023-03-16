@@ -143,6 +143,6 @@ func GenerateTokenByRefreshToken(c context.Context, refreshToken string) (newAcc
 	newAccessToken, newRefreshToken = GenerateTokens(foundUser)
 	//Update user tokens in DB
 	UpdateTokenOnLogin(newAccessToken, newRefreshToken, foundUser.ID)
-	return newAccessToken, newAccessToken, err
+	return newAccessToken, newRefreshToken, err
 
 }

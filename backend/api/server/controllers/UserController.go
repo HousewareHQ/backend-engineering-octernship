@@ -64,8 +64,8 @@ func Login() gin.HandlerFunc {
 		//storing tokens on user document in db
 		helpers.UpdateTokenOnLogin(token, refreshedToken, storedUser.ID)
 		//storing tokens locally in cookies
-		ctx.SetCookie("accesstoken", token, int(AppConstant.TOKEN_EXPIRY), "/users", "localhost", false, true)
-		ctx.SetCookie("refreshtoken", refreshedToken, int(AppConstant.REFRESH_TOKEN_EXPIRY), "/users", "localhost", false, true)
+		ctx.SetCookie("accesstoken", token, int(AppConstant.TOKEN_COOKIE_EXPIRY), "/users", "localhost", false, true)
+		ctx.SetCookie("refreshtoken", refreshedToken, int(AppConstant.REFRESH_TOKEN_COOKIE_EXPIRY), "/users", "localhost", false, true)
 
 		ctx.JSON(http.StatusOK, storedUser)
 
