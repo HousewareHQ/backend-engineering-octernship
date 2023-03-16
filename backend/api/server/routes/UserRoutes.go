@@ -9,8 +9,10 @@ import (
 
 func UserRoutes(routeUrl *gin.Engine) {
 	// Middlware to verify authentication before accessing following routes
-	routeUrl.Use(middlewares.Authenticate()) //User authorization level
+	routeUrl.Use(middlewares.SessionAuthentication()) //whether a session valid or expired
+	routeUrl.Use(middlewares.Authorization())         //User authorization level using token
 
 	routeUrl.GET("/users", controllers.GetAllUsers())
+	routeUrl.POST("/users/logout", controllers.Logout())
 
 }

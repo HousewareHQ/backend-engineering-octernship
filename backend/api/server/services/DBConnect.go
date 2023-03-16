@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func DBClient() *mongo.Client { //RETURNS MONGODB client instance
+func MakeConnection() *mongo.Client { //RETURNS MONGODB client instance
 	err := godotenv.Load("../../.env") //Load .env file to access db credentials
 	if err != nil {
 		log.Fatal("Failed to load ", err.Error())
@@ -43,7 +43,7 @@ func DBClient() *mongo.Client { //RETURNS MONGODB client instance
 }
 
 // Global variable to MongoDB client instance
-var Client *mongo.Client = DBClient()
+var Client *mongo.Client = MakeConnection()
 
 // Returns MongoDB collection
 func OpenCollection(client *mongo.Client, collecName string) *mongo.Collection {

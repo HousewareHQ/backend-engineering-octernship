@@ -20,6 +20,8 @@ import (
 type SignedObject struct {
 	Username  string
 	Usertype  string
+	Org       string
+	ID        primitive.ObjectID
 	CreatedAt time.Time
 	UpdatedOn time.Time
 	jwt.StandardClaims
@@ -35,16 +37,19 @@ func GenerateTokens(newUser models.User) (string, string) {
 	claims := &SignedObject{
 		Username:  newUser.Username,
 		Usertype:  newUser.Usertype,
+		Org:       newUser.Org,
+		ID:        newUser.ID,
 		CreatedAt: newUser.CreatedOn,
 		UpdatedOn: newUser.UpdatedOn,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(1)).Unix(),
+			ExpiresAt: time.Now().Local().Add(AppConstant.TOKEN_EXPIRY).Unix(),
 		},
 	}
 
 	refreshClaims := &SignedObject{
+		ID: newUser.ID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
+			ExpiresAt: time.Now().Local().Add(AppConstant.REFRESH_TOKEN_EXPIRY).Unix(),
 		},
 	}
 	//Creating JWT tokens using signing method algo and claims and then signing with secret key
@@ -59,6 +64,7 @@ func GenerateTokens(newUser models.User) (string, string) {
 	return token, refreshToken
 }
 
+/*tokens update on DB*/
 func UpdateTokenOnLogin(token string, refreshToken string, uid primitive.ObjectID) *mongo.UpdateResult {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
@@ -86,6 +92,7 @@ func UpdateTokenOnLogin(token string, refreshToken string, uid primitive.ObjectI
 
 }
 
+/*Validating access token*/
 func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg string) {
 	token, err := jwt.ParseWithClaims(
 		jwtToken,
@@ -112,5 +119,30 @@ func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg string) {
 
 	//Returning claims(Information in token) and error message if any
 	return claims, errMsg
+
+}
+
+func GenerateTokenByRefreshToken(c context.Context, refreshToken string) (newAccessToken string, newRefreshToken string, err error) {
+	rToken, err := jwt.ParseWithClaims(refreshToken,
+		&SignedObject{},
+		func(t *jwt.Token) (interface{}, error) {
+			return []byte(SECRET_KEY), nil
+		},
+	)
+
+	claims := rToken.Claims.(*SignedObject)
+
+	//Fetching user document using claims {id}
+	userCollection := DBconnect.OpenCollection(DBconnect.Client, AppConstant.USER_COLLECTION)
+	filter := bson.D{{Key: "_id", Value: claims.ID}}
+	res := userCollection.FindOne(c, filter)
+	//Assuming user still exists in database
+	var foundUser models.User
+	res.Decode(&foundUser)
+	//Generate new tokens
+	newAccessToken, newRefreshToken = GenerateTokens(foundUser)
+	//Update user tokens in DB
+	UpdateTokenOnLogin(newAccessToken, newRefreshToken, foundUser.ID)
+	return newAccessToken, newAccessToken, err
 
 }

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	helpers "github.com/HousewareHQ/backend-engineering-octernship/api/server/helpers"
+	"github.com/HousewareHQ/backend-engineering-octernship/api/server/helpers"
 	"github.com/HousewareHQ/backend-engineering-octernship/api/server/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,8 +20,7 @@ func CreateUser() gin.HandlerFunc {
 		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		//ONLY ADMIN CAN CREATE A ACCOUNT
-		if helpers.IsAdmin(ctx) {
+		if helpers.IsAdmin(ctx) { //Admin level authorization Check
 			var newUser models.User
 
 			if err := ctx.BindJSON(&newUser); err != nil {
@@ -45,6 +44,7 @@ func CreateUser() gin.HandlerFunc {
 			}
 
 			//If does not exists,then create new user
+			newUser.Org = ctx.GetString("org")
 			newUser.CreatedOn, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 			newUser.UpdatedOn = newUser.CreatedOn
 			token, refreshToken := helpers.GenerateTokens(newUser)
@@ -77,27 +77,46 @@ func CreateUser() gin.HandlerFunc {
 /*DELETE A USER */
 func DeleteUser() gin.HandlerFunc {
 	//ONLY ADMIN CAN MODIFY/DELETE USER
-
 	return func(ctx *gin.Context) {
+		if !helpers.IsAdmin(ctx) { //Admin level authorization Check
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized logon"})
+			return
+		}
+		//Cancel context,after 10 sec (TIME-OUT)
 		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		uid := ctx.Param("uid") //getting parameter uid from url
 		userObjectId, err := primitive.ObjectIDFromHex(uid)
 		defer cancel()
-
 		if err != nil {
 			log.Panic("Incorrect User ObjectID:MongoDB")
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 
 		}
+
+		//Finding and Deleting document from database
 		filter := bson.D{{Key: "_id", Value: userObjectId}}
-		res, delErr := userCollection.DeleteOne(c, filter)
+		res := userCollection.FindOne(c, filter)
+		var deletingUser models.User
+		findUserErr := res.Decode(&deletingUser)
+		defer cancel()
+		if findUserErr != nil {
+			log.Panic(err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		/*validate:User getting deleted belongs to same organization*/
+		if !helpers.AreFromSameOrg(ctx.GetString("org"), deletingUser.Org) {
+			ctx.JSON(http.StatusForbidden, gin.H{"error": "User doesn't belong to your organization"})
+			return
+		}
+		delRes, delErr := userCollection.DeleteOne(c, filter)
 		defer cancel()
 		if delErr != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": delErr.Error()})
 			return
 		}
-		ctx.JSON(http.StatusOK, res)
+		ctx.JSON(http.StatusOK, delRes)
 	}
 
 }

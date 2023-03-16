@@ -19,6 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// Validator and userCollection variable
 var userCollection *mongo.Collection = DBconnect.OpenCollection(DBconnect.Client, AppConstant.USER_COLLECTION)
 var validate = validator.New()
 
@@ -58,7 +59,13 @@ func Login() gin.HandlerFunc {
 		//password matches,User logged in
 		/*updating jwt tokens of user*/
 		token, refreshedToken := helpers.GenerateTokens(storedUser)
+		storedUser.JWTToken = token
+		storedUser.RefreshToken = refreshedToken
+		//storing tokens on user document in db
 		helpers.UpdateTokenOnLogin(token, refreshedToken, storedUser.ID)
+		//storing tokens locally in cookies
+		ctx.SetCookie("accesstoken", token, int(AppConstant.TOKEN_EXPIRY), "/users", "localhost", false, true)
+		ctx.SetCookie("refreshtoken", refreshedToken, int(AppConstant.REFRESH_TOKEN_EXPIRY), "/users", "localhost", false, true)
 
 		ctx.JSON(http.StatusOK, storedUser)
 
@@ -66,18 +73,30 @@ func Login() gin.HandlerFunc {
 
 }
 
+func Logout() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		//Throw away current logged in session
+		//By removing storedAccess and refresh tokens in cookies
+		ctx.SetCookie("accesstoken", "", -1, "/users", "localhost", false, true)
+		ctx.SetCookie("refreshtoken", "", -1, "/users", "localhost", false, true)
+
+	}
+}
+
+/*Returns all users belonging to requested user's organization*/
 func GetAllUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 
-		//No Filter,all documents will be queried
-		filter := bson.D{}
+		//Filter by organization,all documents will be queried where user.org== docs.org
+		filter := bson.D{{Key: "org", Value: ctx.GetString("org")}}
 		//exclude password field
-		opts := options.Find().SetProjection(bson.D{{Key: "password", Value: 0}})
+		opts := options.Find().SetProjection(bson.D{{Key: "password", Value: 0}, {Key: "jwttoken", Value: 0}, {Key: "refreshtoken", Value: 0}})
 		cursor, err := userCollection.Find(c, filter, opts)
 		defer cancel()
 		if err != nil {
-			log.Panic()
+			log.Panic(err.Error())
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
