@@ -6,6 +6,7 @@ import (
 )
 
 func AuthRoutes(routeUrl *gin.Engine) {
-	routeUrl.POST("/users/login", controllers.Login())
+	routeUrl.POST("/login", controllers.Login())   //login user
+	routeUrl.POST("/logout", controllers.Logout()) //logout user
 
 }

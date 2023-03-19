@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -93,7 +94,9 @@ func UpdateTokenOnLogin(token string, refreshToken string, uid primitive.ObjectI
 }
 
 /*Validating access token*/
-func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg string) {
+func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg error) {
+	var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	errMsg = nil
 	token, err := jwt.ParseWithClaims(
 		jwtToken,
 		&SignedObject{},
@@ -101,20 +104,38 @@ func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg string) {
 			return []byte(SECRET_KEY), nil
 		},
 	)
+	defer cancel()
 	if err != nil {
-		errMsg = err.Error()
-		return
+		errMsg = err
+		return nil, errMsg
 	}
-
+	defer cancel()
 	claims, valid := token.Claims.(*SignedObject) //type assertion that Claims contains concrete SignedObject Value
 	if !valid {
-		errMsg = "Invalid Token Provided"
-		return
+		errMsg = errors.New("TOKEN IS NOT VALID")
+		return nil, errMsg
 	}
+	defer cancel()
+
 	//Token Expiry Validation
 	if claims.ExpiresAt < time.Now().Local().Unix() {
-		errMsg = "Token Expired:Try Login Again."
-		return
+		errMsg = errors.New("token expired-try login again")
+		return nil, errMsg
+	}
+
+	//Fetching user document using claims,in order to check whether user exists or not {id}
+	userCollection := DBconnect.OpenCollection(DBconnect.Client, AppConstant.USER_COLLECTION)
+	filter := bson.D{{Key: "_id", Value: claims.ID}}
+	res := userCollection.FindOne(c, filter)
+	var foundUser models.User
+	res.Decode(&foundUser)
+	/*foundUser's username field will be empty ,
+	if user no longer exists in DB */
+	defer cancel()
+	if foundUser.Username == "" {
+		//User doesnot exist
+		errMsg = errors.New("user no longer exists")
+		return nil, errMsg
 	}
 
 	//Returning claims(Information in token) and error message if any
@@ -136,9 +157,16 @@ func GenerateTokenByRefreshToken(c context.Context, refreshToken string) (newAcc
 	userCollection := DBconnect.OpenCollection(DBconnect.Client, AppConstant.USER_COLLECTION)
 	filter := bson.D{{Key: "_id", Value: claims.ID}}
 	res := userCollection.FindOne(c, filter)
-	//Assuming user still exists in database
 	var foundUser models.User
 	res.Decode(&foundUser)
+	/*foundUser's username field will be empty ,
+	if user no longer exists in DB */
+
+	if foundUser.Username == "" {
+		//User doesnot exist
+		err = errors.New("user no longer exists")
+	}
+
 	//Generate new tokens
 	newAccessToken, newRefreshToken = GenerateTokens(foundUser)
 	//Update user tokens in DB

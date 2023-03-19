@@ -38,7 +38,7 @@ func CreateUser() gin.HandlerFunc {
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
-			if count > 1 {
+			if count > 0 {
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "User already exists"})
 				return
 			}

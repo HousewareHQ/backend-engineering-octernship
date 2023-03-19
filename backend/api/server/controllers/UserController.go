@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -30,8 +31,10 @@ func Login() gin.HandlerFunc {
 		var storedUser models.User
 		defer cancel()
 		//unmarshal encoded-json into struct
+
 		if err := ctx.BindJSON(&user); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			fmt.Println(err.Error())
 			return
 		}
 
@@ -64,8 +67,8 @@ func Login() gin.HandlerFunc {
 		//storing tokens on user document in db
 		helpers.UpdateTokenOnLogin(token, refreshedToken, storedUser.ID)
 		//storing tokens locally in cookies
-		ctx.SetCookie("accesstoken", token, int(AppConstant.TOKEN_COOKIE_EXPIRY), "/users", "localhost", false, true)
-		ctx.SetCookie("refreshtoken", refreshedToken, int(AppConstant.REFRESH_TOKEN_COOKIE_EXPIRY), "/users", "localhost", false, true)
+		ctx.SetCookie("accesstoken", token, int(AppConstant.TOKEN_COOKIE_EXPIRY), "/", "localhost", false, true)
+		ctx.SetCookie("refreshtoken", refreshedToken, int(AppConstant.REFRESH_TOKEN_COOKIE_EXPIRY), "/", "localhost", false, true)
 
 		ctx.JSON(http.StatusOK, storedUser)
 
@@ -78,9 +81,9 @@ func Logout() gin.HandlerFunc {
 
 		//Throw away current logged in session
 		//By removing storedAccess and refresh tokens in cookies
-		ctx.SetCookie("accesstoken", "", -1, "/users", "localhost", false, true)
-		ctx.SetCookie("refreshtoken", "", -1, "/users", "localhost", false, true)
-
+		ctx.SetCookie("accesstoken", "", -1, "/", "localhost", false, true)
+		ctx.SetCookie("refreshtoken", "", -1, "/", "localhost", false, true)
+		ctx.JSON(http.StatusOK, gin.H{"Ok": "Logout"})
 	}
 }
 
@@ -108,7 +111,6 @@ func GetAllUsers() gin.HandlerFunc {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-
 		ctx.JSON(http.StatusOK, results)
 
 		//PAGINATION of records
