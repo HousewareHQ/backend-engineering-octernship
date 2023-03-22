@@ -59,7 +59,7 @@ go run .
 ___
 ## Setting Up FRONTEND
 
-Make sure Node.js envirnoment is setted up.[Setup Node.js](https://nodejs.org/en/download)
+Make sure Node.js environment is setted up.[Setup Node.js](https://nodejs.org/en/download)
 
 **Starting React.js client:**
 ```
@@ -78,6 +78,7 @@ Gin-gonic (Golang API Framework)
 React.js
 <br>
 ![reactjs logo](https://www.datocms-assets.com/45470/1631110818-logo-react-js.png)
+<br>
 MongoDB
 <br>
 ![mongodb logo](https://g.foolcdn.com/art/companylogos/square/mdb.png)
