@@ -7,7 +7,7 @@ import (
 	"github.com/HousewareHQ/backend-engineering-octernship/api/server/middlewares"
 )
 
-func UserRoutes(routeUrl *gin.Engine) {
+func UserRoutes(routeUrl *gin.RouterGroup) {
 	// Middlware to verify authentication before accessing following routes
 	routeUrl.Use(middlewares.SessionAuthentication()) //whether a session valid or expired
 	routeUrl.Use(middlewares.Authorization())         //User authorization level using token

@@ -10,14 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Middleware:Authenticating provided request's session
 func SessionAuthentication() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-		storedToken, _ := ctx.Cookie("accesstoken") //get access-token cookie
+		storedToken, storedTokenErr := ctx.Cookie("accesstoken") //get access-token cookie
 		defer cancel()
+		if storedTokenErr != nil {
+			//if fails to get token from cookie,get it from header:Authorization
+			storedToken = ctx.Request.Header.Get("Authorization") //TO GET TOKEN USING HEADER
+
+		}
 
 		//TRY:Validating access-token
 		_, validTokenErr := helpers.ValidateJWTToken(storedToken)
+		defer cancel()
 		if validTokenErr != nil {
 			if validTokenErr.Error() == "user no longer exists" {
 				//If user doesnt exists anymore then user is unauthorized
@@ -32,12 +39,17 @@ func SessionAuthentication() gin.HandlerFunc {
 
 			if refreshTokenErr != nil {
 				//IF:refresh token is not stored in cookies
-				//REQUIRED:client to relogin
-				ctx.JSON(http.StatusForbidden, gin.H{"SessionExpired": refreshTokenErr.Error()})
-				ctx.Abort()
-				return
+				//THEN:Try to get it from header:Authorization
+				storedRefreshToken = ctx.Request.Header.Get("Authorization") //TO GET TOKEN USING HEADER
+
+				if storedRefreshToken == "" { //If that also fails then suggest relogin
+					ctx.JSON(http.StatusForbidden, gin.H{"SessionExpired": refreshTokenErr.Error()})
+					ctx.Abort()
+					return
+				}
 
 			}
+			//TRY:Validating refresh token
 			_, validRefreshTokenErr := helpers.ValidateJWTToken(storedRefreshToken)
 			defer cancel()
 			if validRefreshTokenErr != nil {
@@ -59,17 +71,19 @@ func SessionAuthentication() gin.HandlerFunc {
 				return
 			}
 
+			//Setting tokens in cookies and in context
 			ctx.SetCookie("accesstoken", accessToken, int(AppConstant.TOKEN_COOKIE_EXPIRY), "/", "localhost", false, true)
 			ctx.SetCookie("refreshtoken", refreshToken, int(AppConstant.REFRESH_TOKEN_COOKIE_EXPIRY), "/", "localhost", false, true)
 			ctx.Set("accesstoken", accessToken)
 			ctx.Set("refreshtoken", refreshToken)
-			ctx.Next()
+			ctx.Next() //passing current context to next one
 
 		}
 
 	}
 }
 
+// Middleware:Authorization
 func Authorization() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -87,13 +101,18 @@ func Authorization() gin.HandlerFunc {
 		var tokenAccessErr error
 		if clientJwtToken = ctx.GetString("accesstoken"); clientJwtToken == "" {
 			clientJwtToken, tokenAccessErr = ctx.Cookie("accesstoken")
+			if tokenAccessErr != nil { //If Fails to get access token from cookie
+				//Get token from header:Authorization
+				clientJwtToken = ctx.Request.Header.Get("Authorization") //TO GET TOKEN USING HEADER
 
-		}
-		//clientJwtToken := ctx.Request.Header.Get("token") //TO GET TOKEN USING HEADER
-		if tokenAccessErr != nil { //If Fails to get access token from cookie:Suggest relogin
-			ctx.JSON(http.StatusForbidden, gin.H{"SessionExpired": tokenAccessErr.Error()})
-			ctx.Abort()
-			return
+			}
+			if clientJwtToken == "" { //if fails then suggest relogin
+
+				ctx.JSON(http.StatusForbidden, gin.H{"SessionExpired": tokenAccessErr.Error()})
+				ctx.Abort()
+				return
+			}
+
 		}
 
 		//Validate JWT token

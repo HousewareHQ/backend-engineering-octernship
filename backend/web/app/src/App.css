@@ -1,0 +1,69 @@
+.App {
+  display: flex;
+  /*uses 100% viewport as min height*/
+  min-height: 100vh; 
+  justify-content: left;  
+  background: linear-gradient(110.6deg, rgb(156, 116, 129) -18.3%, rgb(67, 54, 74) 16.4%, rgb(47, 48, 67) 68.2%, rgb(27, 23, 36) 99.1%);
+}
+
+
+.div-login-container,.login-form{
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+    flex-direction: column;
+    
+}
+label{
+  color:white;
+  display: flex;
+  text-align: left;
+  padding: .5rem 0;
+}
+
+input{
+  margin: .5rem 0;
+  border-radius: 8px;
+  padding: 0.5rem;
+  border:none;
+}
+
+button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  color:white;
+  font-family:'Courier New', Courier, monospace;
+  border: none; 
+  
+  background: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
+  padding: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+table,th,td{
+  border: 1px solid;
+}
+th,td{
+  padding: 1rem 0;
+  
+}
+table{
+    border-collapse: collapse;
+}
+.users-container{
+  float: left;
+  
+}
+.dashboard-container{
+  margin-left:20px;
+}
+.create-user-container{
+  float:right;
+  margin-left: 300px;
+}
+#button-createuser{
+  margin-top: 30px;
+}

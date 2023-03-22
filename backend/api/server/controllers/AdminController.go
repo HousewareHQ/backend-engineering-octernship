@@ -13,6 +13,21 @@ import (
 	primitive "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// CreateUser 		godoc
+// @Summary			Create user.[ADMIN AUTHORIZED ONLY]
+// @Description		Creates user in same organization as current user,returns insertion number.
+// @ID				CreateUser
+// @Tags			Access Users inventory
+// @Produce 		application/json
+// @Consume 		application/json
+// @Param			Cookie header string false "Send tokens using Cookie header<br>(Example:Cookie: accesstoken=eyJhbGc..; refreshtoken=eyJhbGciOiJ..)"
+// @Param			create-user body models.CreateUserBody true "(Username:min 3 to max 15 char.Password:min 4 char).<br>FOR API TESTING Only:To override create user inorder to create user in different org. pass a third param 'org'."
+// @Security 		ApiToken
+// @Success			200 {object} models.CreateUserResponse
+// @Failure			500
+// @Failure			401
+// @Failure			400
+// @Router 			/users/create-user [post]
 // CREATE USER (ONLY ADMIN)
 func CreateUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -23,6 +38,7 @@ func CreateUser() gin.HandlerFunc {
 		if helpers.IsAdmin(ctx) { //Admin level authorization Check
 			var newUser models.User
 
+			//Unmarshaling json into struct
 			if err := ctx.BindJSON(&newUser); err != nil {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
@@ -38,13 +54,20 @@ func CreateUser() gin.HandlerFunc {
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
-			if count > 0 {
+			if count > 0 { //if exists
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "User already exists"})
 				return
 			}
 
 			//If does not exists,then create new user
-			newUser.Org = ctx.GetString("org")
+			if newUser.Org == "" {
+				// if not provided in request body then use context to get current's organization
+				/* basically will help to override creating user in current user's org,so
+				that we can create different org user's for testing*/
+				newUser.Org = ctx.GetString("org")
+
+			}
+			//Setting User data
 			newUser.CreatedOn, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 			newUser.UpdatedOn = newUser.CreatedOn
 			token, refreshToken := helpers.GenerateTokens(newUser)
@@ -74,6 +97,21 @@ func CreateUser() gin.HandlerFunc {
 
 }
 
+// DeleteUser 		godoc
+// @Summary			Delete user by id,if exists.[ADMIN AUTHORIZED ONLY]
+// @Description		Deletes user by id in same organization as current user
+// @ID				DeleteUser
+// @Produce 		application/json
+// @Param			Cookie header string false "Send tokens using Cookie header<br>(Example:Cookie: accesstoken=eyJhbGc..; refreshtoken=eyJhbGciOiJ..)"
+// @Param 			uid path string true "ID of user"
+// @Tags			Access Users inventory
+// @Security 		ApiToken
+// @Success			200 {object} string
+// @Failure			400
+// @Failure			404 "User not found"
+// @Failure			500
+// @Failure			401
+// @Router 			/users/delete/{id} [delete]
 /*DELETE A USER */
 func DeleteUser() gin.HandlerFunc {
 	//ONLY ADMIN CAN MODIFY/DELETE USER

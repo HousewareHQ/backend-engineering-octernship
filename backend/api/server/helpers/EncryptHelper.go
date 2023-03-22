@@ -15,7 +15,7 @@ func Hashing(pass string) string {
 	return string(hashedBytes)
 }
 
-/*Match password for login*/
+/*Match hashed password for login*/
 func VerifyPassword(enteredPassword string, storedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(enteredPassword))
 

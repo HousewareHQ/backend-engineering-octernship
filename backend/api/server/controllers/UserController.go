@@ -24,14 +24,26 @@ import (
 var userCollection *mongo.Collection = DBconnect.OpenCollection(DBconnect.Client, AppConstant.USER_COLLECTION)
 var validate = validator.New()
 
+// Login User 		godoc
+// @Summary			Login User
+// @Description		Login user and create new session(assigns access-token & refresh-token to user)
+// @ID				Authentication
+// @Produce 		application/json
+// @Consume 		application/json
+// @Param			login-request body models.LoginRequestBody true "User Credentials"
+// @Tags			Authentication Endpoints
+// @Success			200 {object} models.User
+// @Failure			500
+// @Header 200 {string} Set-Cookie "accesstoken+refreshtoken"
+// @Router 			/login [post]
 func Login() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		var user models.User
 		var storedUser models.User
 		defer cancel()
-		//unmarshal encoded-json into struct
 
+		//unmarshal encoded-json into struct
 		if err := ctx.BindJSON(&user); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			fmt.Println(err.Error())
@@ -76,6 +88,16 @@ func Login() gin.HandlerFunc {
 
 }
 
+// Logout User 		godoc
+// @Summary			Logout User
+// @Description		Logout user and Destroys user's session by expiring tokens cookie
+// @ID				Logout
+// @Produce 		application/json
+// @Tags			Authentication Endpoints
+// @Success			200
+// @Failure			500
+// @Header 200 {string} Set-Cookie "(accesstoken+refreshtoken)-expired"
+// @Router 			/logout [post]
 func Logout() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -87,8 +109,66 @@ func Logout() gin.HandlerFunc {
 	}
 }
 
-/*Returns all users belonging to requested user's organization*/
+// RefreshTokenRotate  godoc
+// @Summary			Refresh Token Rotate
+// @Description		Returns and assigns new access-token and refresh-token
+// @ID				RefreshTokenRotate
+// @Produce 		application/json
+// @Param			Cookie header string false "Send token using Cookie header<br>(Example:Cookie:refreshtoken=eyJhbGciOiJ..)"
+// @Tags			Authentication Endpoints
+// @Security 		ApiToken
+// @Success			200 {object} models.RefreshRotateResponse
+// @Failure			500
+// @Header 200 {string} Set-Cookie "accesstoken+refreshtoken"
+// @Router 			/refresh-rotate [post]
+func RefreshTokenRotate() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+		//GET refresh token from header
+		oldRefreshToken := ctx.GetHeader("Authorization")
+		if oldRefreshToken == "" { // if no refresh token provided in header
+			var refreshTokenErr error
+			//Check if refresh token is present in cookies
+			oldRefreshToken, refreshTokenErr = ctx.Cookie("refreshtoken")
+			defer cancel()
+			if refreshTokenErr != nil { // if fails then show InternalServerError
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": refreshTokenErr.Error()})
+				return
+			}
+		}
+		defer cancel()
+
+		//generate new tokens using fetched old refreshtoken
+		accessToken, refreshToken, generateTokenErr := helpers.GenerateTokenByRefreshToken(c, oldRefreshToken)
+		if generateTokenErr != nil {
+			//IF:fail to generate valid token then user is no longer authorized.
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": generateTokenErr.Error()})
+			ctx.Abort()
+			return
+
+		}
+		//Store tokens in cookies
+		ctx.SetCookie("accesstoken", accessToken, int(AppConstant.TOKEN_COOKIE_EXPIRY), "/", "localhost", false, true)
+		ctx.SetCookie("refreshtoken", refreshToken, int(AppConstant.REFRESH_TOKEN_COOKIE_EXPIRY), "/", "localhost", false, true)
+		//send newly generated tokens.
+		ctx.JSON(http.StatusOK, gin.H{"accesstoken": accessToken, "refreshtoken": refreshToken})
+	}
+}
+
+// GetAllUsers 		godoc
+// @Summary			Get All User's List
+// @Description		Returns All Users in current user's organization,omits security sensitive fields
+// @ID				GetAllUsers
+// @Consume 		application/json
+// @Produce 		application/json
+// @Param			Cookie header string false "Send tokens using Cookie header<br>(Example:Cookie: accesstoken=eyJhbGc..; refreshtoken=eyJhbGciOiJ..)"
+// @Tags			Access Users inventory
+// @Security 		ApiToken
+// @Success			200 {array} models.User
+// @Failure			500
+// @Router 			/users [get]
 func GetAllUsers() gin.HandlerFunc {
+	//Returns all users belonging to requested user's organization
 	return func(ctx *gin.Context) {
 		var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 

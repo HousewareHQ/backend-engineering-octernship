@@ -28,12 +28,12 @@ type SignedObject struct {
 	jwt.StandardClaims
 }
 
-// TODO:Add secret key
-var SECRET_KEY = os.Getenv("MONGODB_CREDURL")
+// TODO:Add proper secret key
+var SECRET_KEY = os.Getenv("MONGODB_CREDURL") //for simplicity purpose
 
+// Generate access-token and refresh-token using JWT
 func GenerateTokens(newUser models.User) (string, string) {
-
-	//Storing username and creation time in JWT along with expire time
+	//Storing user data in JWT along with expire time as claims
 	//EXPIRY TIME-> JWT token:1hr ,refresh token :24hr
 	claims := &SignedObject{
 		Username:  newUser.Username,
@@ -47,6 +47,7 @@ func GenerateTokens(newUser models.User) (string, string) {
 		},
 	}
 
+	//Creating refresh token ,storing only user's ID as claims
 	refreshClaims := &SignedObject{
 		ID: newUser.ID,
 		StandardClaims: jwt.StandardClaims{
@@ -76,11 +77,10 @@ func UpdateTokenOnLogin(token string, refreshToken string, uid primitive.ObjectI
 	updatedUser = append(updatedUser, bson.E{Key: "refreshtoken", Value: refreshToken})
 	updatedUser = append(updatedUser, bson.E{Key: "updatedon", Value: currentTime})
 
-	userCollection := DBconnect.OpenCollection(DBconnect.Client, AppConstant.USER_COLLECTION)
+	userCollection := DBconnect.OpenCollection(DBconnect.Client, AppConstant.USER_COLLECTION) //MongoDBCollection
 
 	/*Update document in MongoDB*/
 	filter := bson.D{{Key: "_id", Value: uid}} //_id == uid documents will be effectedd
-
 	opts := options.Update().SetUpsert(true)
 	result, err := userCollection.UpdateOne(ctx, filter, bson.D{{Key: "$set", Value: updatedUser}}, opts)
 
@@ -97,6 +97,7 @@ func UpdateTokenOnLogin(token string, refreshToken string, uid primitive.ObjectI
 func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg error) {
 	var c, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	errMsg = nil
+	//retrieving claims using provided token
 	token, err := jwt.ParseWithClaims(
 		jwtToken,
 		&SignedObject{},
@@ -111,7 +112,7 @@ func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg error) {
 	}
 	defer cancel()
 	claims, valid := token.Claims.(*SignedObject) //type assertion that Claims contains concrete SignedObject Value
-	if !valid {
+	if !valid {                                   //if not valid token
 		errMsg = errors.New("TOKEN IS NOT VALID")
 		return nil, errMsg
 	}
@@ -143,14 +144,15 @@ func ValidateJWTToken(jwtToken string) (claims *SignedObject, errMsg error) {
 
 }
 
+// To generate new tokens by provided refresh token
 func GenerateTokenByRefreshToken(c context.Context, refreshToken string) (newAccessToken string, newRefreshToken string, err error) {
+	//Retrieving claims from provided refresh token
 	rToken, err := jwt.ParseWithClaims(refreshToken,
 		&SignedObject{},
 		func(t *jwt.Token) (interface{}, error) {
 			return []byte(SECRET_KEY), nil
 		},
 	)
-
 	claims := rToken.Claims.(*SignedObject)
 
 	//Fetching user document using claims {id}

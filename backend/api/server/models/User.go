@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// User model
 type User struct {
 	Username     string             `json:"username" validate:"required,min=3,max=15"`
 	Password     string             `json:"password" validate:"required,min=4"`
