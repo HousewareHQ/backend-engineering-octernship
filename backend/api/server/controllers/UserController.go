@@ -165,6 +165,7 @@ func RefreshTokenRotate() gin.HandlerFunc {
 // @Tags			Access Users inventory
 // @Security 		ApiToken
 // @Success			200 {array} models.User
+// @Failure			401
 // @Failure			500
 // @Router 			/users [get]
 func GetAllUsers() gin.HandlerFunc {

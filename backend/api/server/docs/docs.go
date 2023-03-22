@@ -168,6 +168,9 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
