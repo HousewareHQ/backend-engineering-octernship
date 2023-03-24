@@ -1,3 +1,17 @@
+# Organization's API (Authentication+Authorization)
+
+## **Please Refer README.md files in <br> '/backend' - Setting up backend and frontend. <br> '/backend/api'-Getting started with testing API. <br> '/backend/web/app-Getting started with web client.<br> Directories to get started with setting up and testing the assignment project.**
+© 2023 github.com/thepranays. All rights reserved.
+
+---
+---
+
+
+
+
+
+
+
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=10472174&assignment_repo_type=AssignmentRepo)
 ## Houseware
 

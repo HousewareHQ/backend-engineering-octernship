@@ -1,9 +1,4 @@
 # To start testing API:
-Step 1:Start server
-```
-go run main.go
-```
->Visit http://localhost:8080/api/v1/swagger/index.html
 
 ### **Way 1**:
 Step1 -Add below line to your .env file

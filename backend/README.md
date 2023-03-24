@@ -1,5 +1,5 @@
 # Instructions:
-## Setting Up BACKEND
+## **Setting Up BACKEND**
 Make sure golang environment is setted up.[Setup golang](https://go.dev/doc/install)<br>
 ## STEP #1:
 **Clone Repository**
@@ -55,9 +55,11 @@ cd /houseware---backend-engineering-octernship-thepranays/backend/api/server
 
 go run .
 ```
+**Note:Please check README.md in 'backend/api 'directory in order to get started with testing API endpoints.**
+
 ---
 ___
-## Setting Up FRONTEND
+## **Setting Up FRONTEND**
 
 Make sure Node.js environment is setted up.[Setup Node.js](https://nodejs.org/en/download)
 
@@ -72,7 +74,7 @@ npm start
 
 - - -
 ## Tech Stack:
-Gin-gonic (Golang API Framework)
+Gin-gonic (Golang API Framework) + MongoDB Go Driver
 <br>
 ![gin-gonic logo](https://preview.redd.it/3dto8z3ma7671.png?width=960&crop=smart&auto=webp&v=enabled&s=6b6fa77f1355b4dbeccd2637c5ee2967d92aab58)
 React.js

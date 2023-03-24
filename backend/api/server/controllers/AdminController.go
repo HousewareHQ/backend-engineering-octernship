@@ -47,13 +47,14 @@ func CreateUser() gin.HandlerFunc {
 
 			//DBconnect.PingDB()->To test connection to DB
 
-			//Validating:Does user exists already?
-			count, err := userCollection.CountDocuments(context.TODO(), bson.M{"username": newUser.Username})
+			//Validating:Does user exists already in current admin's org?
+			count, err := userCollection.CountDocuments(context.TODO(), bson.D{{Key: "org", Value: ctx.GetString("org")}, {Key: "username", Value: newUser.Username}})
 			if err != nil {
 
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
+
 			if count > 0 { //if exists
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "User already exists"})
 				return
