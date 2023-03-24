@@ -1,4 +1,4 @@
-# FRONTEND(React.js)
+# FRONTEND (React.js)
 ## To start web client:
 ```
 cd /backend/web/app

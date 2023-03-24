@@ -57,6 +57,7 @@ go run .
 ```
 **Note:Please check README.md in 'backend/api 'directory in order to get started with testing API endpoints.**
 
+
 ---
 ___
 ## **Setting Up FRONTEND**
@@ -87,8 +88,10 @@ MongoDB
 
 ___
 # More detailed information:
-**/backend/api/README.md**:Information on API endpoints,architecture and database design. 
+**/backend/api/README.md**:API endpoints,architecture and database design. 
 
-**/backend/web/app/README.md**:Information on Frontend Client.
+**/backend/web/app/README.md**:Frontend Client.
+___
+#### Note:Didn't add unit tests completely,as I was unable to think proper logic and find the best practice to implement unit tests for given API endpoints.
 
 
