@@ -56,7 +56,7 @@ Step 2:
 >Visit:http://localhost:8080/api/v1/swagger/index.html
 
 # API Architecture
-![api architecture](https://i.ibb.co/ncTLk3J/authbackend-drawio.png)
+![api architecture](https://i.ibb.co/CMkYnTG/authbackend-drawio.png)
 
 
 
