@@ -2,7 +2,7 @@ package middlewares
 
 import "github.com/gin-gonic/gin"
 
-func PreflightRequestMiddleware() gin.HandlerFunc { //cross origin resource policy
+func PreflightRequestMiddleware() gin.HandlerFunc { //preflight request resource policy
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") //ORIGIN:From where API calls will be made i.e.React.js client.
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")             //TO TRANSFER COOKIES
