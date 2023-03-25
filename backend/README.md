@@ -1,207 +1,300 @@
-# Standard Go Project Layout
+# Authorization + Authentication service in Golang using JWT
 
-Translations:
+<summary><a href="#important-change-to-be-made-before-running">Please check this out before proceeding to installation.</a></summary>
 
-* [한국어 문서](README_ko.md)
-* [简体中文](README_zh.md)
-* [正體中文](README_zh-TW.md)
-* [简体中文](README_zh-CN.md) - ???
-* [Français](README_fr.md)
-* [日本語](README_ja.md)
-* [Portuguese](README_ptBR.md)
-* [Español](README_es.md)
-* [Română](README_ro.md)
-* [Русский](README_ru.md)
-* [Türkçe](README_tr.md)
-* [Українська](README_ua.md)
+<summary><a href="#important-change-to-be-made-before-running">Did you follow this or not ?</a></summary>
 
-## Overview
+<summary><a href="#important-change-to-be-made-before-running">Error connecting to DB. Follow this.</a></summary>
 
-This is a basic layout for Go application projects. It's **`not an official standard defined by the core Go dev team`**; however, it is a set of common historical and emerging project layout patterns in the Go ecosystem. Some of these patterns are more popular than others. It also has a number of small enhancements along with several supporting directories common to any large enough real world application.
+## Where is the source code ?
 
-**`If you are trying to learn Go or if you are building a PoC or a simple project for yourself this project layout is an overkill. Start with something really simple instead (a single `main.go` file and `go.mod` is more than enough).`** As your project grows keep in mind that it'll be important to make sure your code is well structured otherwise you'll end up with a messy code with lots of hidden dependencies and global state. When you have more people working on the project you'll need even more structure. That's when it's important to introduce a common way to manage packages/libraries. When you have an open source project or when you know other projects import the code from your project repository that's when it's important to have private (aka `internal`) packages and code. Clone the repository, keep what you need and delete everything else! Just because it's there it doesn't mean you have to use it all. None of these patterns are used in every single project. Even the `vendor` pattern is not universal.
+> `backend/cmd` - contains the main.go file and all the other necessary folders.
 
-With Go 1.14 [`Go Modules`](https://github.com/golang/go/wiki/Modules) are finally ready for production. Use [`Go Modules`](https://blog.golang.org/using-go-modules) unless you have a specific reason not to use them and if you do then you don’t need to worry about $GOPATH and where you put your project. The basic `go.mod` file in the repo assumes your project is hosted on GitHub, but it's not a requirement. The module path can be anything though the first module path component should have a dot in its name (the current version of Go doesn't enforce it anymore, but if you are using slightly older versions don't be surprised if your builds fail without it). See Issues [`37554`](https://github.com/golang/go/issues/37554) and [`32819`](https://github.com/golang/go/issues/32819) if you want to know more about it.
+> `backend/test` - contains the test code.
 
-This project layout is intentionally generic and it doesn't try to impose a specific Go package structure.
+## Features
 
-This is a community effort. Open an issue if you see a new pattern or if you think one of the existing patterns needs to be updated.
+- User Login
+- User Logout
+- All passwords are hashed before storing in the database.
+- Admin User adds a new User account(by providing the username & password)
+- Admin User deletes an existing User account from their organization
+- List all Users in their organization
+- Admin User adds a new Organization(by providing the organization name & head)
 
-If you need help with naming, formatting and style start by running [`gofmt`](https://golang.org/cmd/gofmt/) and [`golint`](https://github.com/golang/lint). Also make sure to read these Go code style guidelines and recommendations:
-* https://talks.golang.org/2014/names.slide
-* https://golang.org/doc/effective_go.html#names
-* https://blog.golang.org/package-names
-* https://github.com/golang/go/wiki/CodeReviewComments
-* [Style guideline for Go packages](https://rakyll.org/style-packages) (rakyll/JBD)
+## Architecture / Stack
 
-See [`Go Project Layout`](https://medium.com/golang-learn/go-project-layout-e5213cdcfaa2) for additional background information.
+- Golang framework - [Gofiber](https://pkg.go.dev/github.com/gofiber/fiber@v1.14.6)
+- Database - [MySQL](https://www.mysql.com/)
+- ORM - [GORM](https://pkg.go.dev/gorm.io/gorm@v1.24.6)
+- JWT - [jwt-go](https://pkg.go.dev/github.com/dgrijalva/jwt-go@v3.2.0)
+- Password Hashing - [bcrypt](https://pkg.go.dev/golang.org/x/crypto@v0.7.0/bcrypt)
+- Unit Testing: [Testing package](https://pkg.go.dev/testing)
 
-More about naming and organizing packages as well as other code structure recommendations:
-* [GopherCon EU 2018: Peter Bourgon - Best Practices for Industrial Programming](https://www.youtube.com/watch?v=PTE4VJIdHPg)
-* [GopherCon Russia 2018: Ashley McNamara + Brian Ketelsen - Go best practices.](https://www.youtube.com/watch?v=MzTcsI6tn-0)
-* [GopherCon 2017: Edward Muller - Go Anti-Patterns](https://www.youtube.com/watch?v=ltqV6pDKZD8)
-* [GopherCon 2018: Kat Zien - How Do You Structure Your Go Apps](https://www.youtube.com/watch?v=oL6JBUk6tj0)
+## Installation
 
-A Chinese post about Package-Oriented-Design guidelines and Architecture layer
-* [面向包的设计和架构分层](https://github.com/danceyoung/paper-code/blob/master/package-oriented-design/packageorienteddesign.md)
+This app requires [Go](https://go.dev/doc/install) v1.20+ to run.  
+Also make sure to install [docker](https://www.docker.com/products/docker-desktop/) and [docker-compose](https://docs.docker.com/compose/install/) for your operating system.
 
-## Go Directories
+Clone the repository
 
-### `/cmd`
+```bash
+  git clone https://github.com/HousewareHQ/houseware---backend-engineering-octernship-RohitShah1706.git
+```
 
-Main applications for this project.
+## Run using go locally.
 
-The directory name for each application should match the name of the executable you want to have (e.g., `/cmd/myapp`).
+Install the dependencies:
 
-Don't put a lot of code in the application directory. If you think the code can be imported and used in other projects, then it should live in the `/pkg` directory. If the code is not reusable or if you don't want others to reuse it, put that code in the `/internal` directory. You'll be surprised what others will do, so be explicit about your intentions!
+```bash
+  cd houseware---backend-engineering-octernship-RohitShah1706/backend
+  go mod download
+```
 
-It's common to have a small `main` function that imports and invokes the code from the `/internal` and `/pkg` directories and nothing else.
+Run the application
 
-See the [`/cmd`](cmd/README.md) directory for examples.
+```bash
+  go run cmd/main.go
+```
 
-### `/internal`
+This will start the dev server on port 8080.
 
-Private application and library code. This is the code you don't want others importing in their applications or libraries. Note that this layout pattern is enforced by the Go compiler itself. See the Go 1.4 [`release notes`](https://golang.org/doc/go1.4#internalpackages) for more details. Note that you are not limited to the top level `internal` directory. You can have more than one `internal` directory at any level of your project tree.
+## Or run using docker in dev environment
 
-You can optionally add a bit of extra structure to your internal packages to separate your shared and non-shared internal code. It's not required (especially for smaller projects), but it's nice to have visual clues showing the intended package use. Your actual application code can go in the `/internal/app` directory (e.g., `/internal/app/myapp`) and the code shared by those apps in the `/internal/pkg` directory (e.g., `/internal/pkg/myprivlib`).
+We will use the following docker images along with our own go-app image  
+| Plugin | Links |
+| ------ | ------ |
+| Nginx | https://hub.docker.com/_/nginx |
+| MYSQL | https://hub.docker.com/_/mysql |
+| Golang | https://hub.docker.com/_/golang |
 
-### `/pkg`
+Build required docker images and start the container.
 
-Library code that's ok to use by external applications (e.g., `/pkg/mypubliclib`). Other projects will import these libraries expecting them to work, so think twice before you put something here :-) Note that the `internal` directory is a better way to ensure your private packages are not importable because it's enforced by Go. The `/pkg` directory is still a good way to explicitly communicate that the code in that directory is safe for use by others. The [`I'll take pkg over internal`](https://travisjeffery.com/b/2019/11/i-ll-take-pkg-over-internal/) blog post by Travis Jeffery provides a good overview of the `pkg` and `internal` directories and when it might make sense to use them.
+```bash
+  docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
 
-It's also a way to group Go code in one place when your root directory contains lots of non-Go components and directories making it easier to run various Go tools (as mentioned in these talks: [`Best Practices for Industrial Programming`](https://www.youtube.com/watch?v=PTE4VJIdHPg) from GopherCon EU 2018, [GopherCon 2018: Kat Zien - How Do You Structure Your Go Apps](https://www.youtube.com/watch?v=oL6JBUk6tj0) and [GoLab 2018 - Massimiliano Pippi - Project layout patterns in Go](https://www.youtube.com/watch?v=3gQa1LWwuzk)).
+This will automatically start the go-app on port 8080 if in dev mode.  
+If in prod mod it will start the server on port 80 TCP.
 
-See the [`/pkg`](pkg/README.md) directory if you want to see which popular Go repos use this project layout pattern. This is a common layout pattern, but it's not universally accepted and some in the Go community don't recommend it.
+This docker-compose file sets up a basic web application with three services:  
+| Container | Role |
+| ------ | ------ |
+| go-app | Handles the main login for running the app. |
+| nginx | Acts as a reverse proxy to the go-app service, so incoming traffic to the application can be efficiently directed to the appropriate service. Can also act as a load-balancer to distribute requests across multiple instances of the go-app service. |
+| mysql | Runs MySQL database and creates a persistent volume for data storage. This way your data persists even after tearing down the containers. |
 
-It's ok not to use it if your app project is really small and where an extra level of nesting doesn't add much value (unless you really want to :-)). Think about it when it's getting big enough and your root directory gets pretty busy (especially if you have a lot of non-Go app components).
+This setup provides a scalable and easily deployable web application architecture that can be customized further according to specific requirements.
 
-The `pkg` directory origins: The old Go source code used to use `pkg` for its packages and then various Go projects in the community started copying the pattern (see [`this`](https://twitter.com/bradfitz/status/1039512487538970624) Brad Fitzpatrick's tweet for more context).
+## Environment Variables
 
-### `/vendor`
+To run this application, you will need to add the following environment variables to your .env file.  
+For development mode the `.env` file is present in backend directory.
 
-Application dependencies (managed manually or by your favorite dependency management tool like the new built-in [`Go Modules`](https://github.com/golang/go/wiki/Modules) feature). The `go mod vendor` command will create the `/vendor` directory for you. Note that you might need to add the `-mod=vendor` flag to your `go build` command if you are not using Go 1.14 where it's on by default.
+`SECRET_KEY`
 
-Don't commit your application dependencies if you are building a library.
+`NGINX_PORT`
 
-Note that since [`1.13`](https://golang.org/doc/go1.13#modules) Go also enabled the module proxy feature (using [`https://proxy.golang.org`](https://proxy.golang.org) as their module proxy server by default). Read more about it [`here`](https://blog.golang.org/module-mirror-launch) to see if it fits all of your requirements and constraints. If it does, then you won't need the `vendor` directory at all.
+`DB_USERNAME`
 
-## Service Application Directories
+`DB_PASSWORD`
 
-### `/api`
+`DB_HOST`
 
-OpenAPI/Swagger specs, JSON schema files, protocol definition files.
+`DB_PORT`
 
-See the [`/api`](api/README.md) directory for examples.
+`DB_NAME`
 
-## Web Application Directories
+`ADMIN_ORG_NAME`
 
-### `/web`
+`ADMIN_ORG_HEAD`
 
-Web application specific components: static web assets, server side templates and SPAs.
+`ADMIN_USERNAME`
 
-## Common Application Directories
+`ADMIN_PASSWORD`
 
-### `/configs`
+## Important change to be made before running
 
-Configuration file templates or default configs.
+> `DB_HOST` in `.env` file should be localhost if running the app using go command.  
+> `DB_HOST` in `.env` file should be `mysql` or whatever is the name of your MySQL service so that docker's internal dns will replace with the appropriate IP Address.
 
-Put your `confd` or `consul-template` template files here.
+## Postman API Reference
 
-### `/init`
+> [Postman API access](https://elements.getpostman.com/redirect?entityId=20239076-994ff5e1-5715-49b9-a59e-d3f84e2f3c78&entityType=collection) - all the endpoints are here for your direct testing.
 
-System init (systemd, upstart, sysv) and process manager/supervisor (runit, supervisord) configs.
+### Admin endpoints - protected with isAdminCheck middleware
 
-### `/scripts`
+#### Create Organisation
 
-Scripts to perform various build, install, analysis, etc operations.
+```http
+  POST /api/org
+```
 
-These scripts keep the root level Makefile small and simple (e.g., [`https://github.com/hashicorp/terraform/blob/master/Makefile`](https://github.com/hashicorp/terraform/blob/master/Makefile)).
+| Body   | Type     | Description                                   |
+| :----- | :------- | :-------------------------------------------- |
+| `name` | `string` | **Required** Name of the organisation         |
+| `head` | `string` | **Required** Name of the head of organisation |
 
-See the [`/scripts`](scripts/README.md) directory for examples.
+#### Delete Organisation
 
-### `/build`
+```http
+  DELETE /api/org
+```
 
-Packaging and Continuous Integration.
+| Body   | Type     | Description                           |
+| :----- | :------- | :------------------------------------ |
+| `name` | `string` | **Required** Name of the organisation |
 
-Put your cloud (AMI), container (Docker), OS (deb, rpm, pkg) package configurations and scripts in the `/build/package` directory.
+#### Update Organisation details
 
-Put your CI (travis, circle, drone) configurations and scripts in the `/build/ci` directory. Note that some of the CI tools (e.g., Travis CI) are very picky about the location of their config files. Try putting the config files in the `/build/ci` directory linking them to the location where the CI tools expect them (when possible).
+```http
+  PATCH /api/org
+```
 
-### `/deployments`
+| Body   | Type     | Description                                       |
+| :----- | :------- | :------------------------------------------------ |
+| `name` | `string` | **Required** Name of the organisation             |
+| `head` | `string` | **Required** Name of the new head of organisation |
 
-IaaS, PaaS, system and container orchestration deployment configurations and templates (docker-compose, kubernetes/helm, mesos, terraform, bosh). Note that in some repos (especially apps deployed with kubernetes) this directory is called `/deploy`.
+#### Create User Account
 
-### `/test`
+```http
+  POST /api/auth
+```
 
-Additional external test apps and test data. Feel free to structure the `/test` directory anyway you want. For bigger projects it makes sense to have a data subdirectory. For example, you can have `/test/data` or `/test/testdata` if you need Go to ignore what's in that directory. Note that Go will also ignore directories or files that begin with "." or "_", so you have more flexibility in terms of how you name your test data directory.
+| Body       | Type     | Description                                                       |
+| :--------- | :------- | :---------------------------------------------------------------- |
+| `username` | `string` | **Required** Name of the user                                     |
+| `password` | `string` | **Required** Password that will be hashed while storing in the DB |
+| `org_id`   | `string` | **Required** Organisation the user belongs to                     |
 
-See the [`/test`](test/README.md) directory for examples.
+#### Delete User Account
 
-## Other Directories
+```http
+  DELETE /api/auth
+```
 
-### `/docs`
+| Body       | Type     | Description                   |
+| :--------- | :------- | :---------------------------- |
+| `username` | `string` | **Required** Name of the user |
 
-Design and user documents (in addition to your godoc generated documentation).
+### User endpoints - public
 
-See the [`/docs`](docs/README.md) directory for examples.
+#### Login to account - will create a new JWT token with expiry time of 1 hour
 
-### `/tools`
+```http
+  POST /api/auth/login
+```
 
-Supporting tools for this project. Note that these tools can import code from the `/pkg` and `/internal` directories.
+| Body       | Type     | Description                       |
+| :--------- | :------- | :-------------------------------- |
+| `username` | `string` | **Required** Name of the user     |
+| `password` | `string` | **Required** Password of the user |
 
-See the [`/tools`](tools/README.md) directory for examples.
+#### Refresh access token - grants a new acces token with an expiry time of 24 hours
 
-### `/examples`
+```http
+  POST /api/auth/refresh
+```
 
-Examples for your applications and/or public libraries.
+| Cookie | Type           | Description                                                                                       |
+| :----- | :------------- | :------------------------------------------------------------------------------------------------ |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to refresh the current token |
 
-See the [`/examples`](examples/README.md) directory for examples.
+#### Get user account
 
-### `/third_party`
+```http
+  GET /api/auth/user
+```
 
-External helper tools, forked code and other 3rd party utilities (e.g., Swagger UI).
+| Cookie | Type           | Description                                                                                       |
+| :----- | :------------- | :------------------------------------------------------------------------------------------------ |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to get their account details |
 
-### `/githooks`
+#### Logout
 
-Git hooks.
+```http
+  GET /api/auth/logout
+```
 
-### `/assets`
+| Cookie | Type           | Description                                                                    |
+| :----- | :------------- | :----------------------------------------------------------------------------- |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to logout |
 
-Other assets to go along with your repository (images, logos, etc).
+#### Get people in same organisation
 
-### `/website`
+```http
+  GET /api/org
+```
 
-This is the place to put your project's website data if you are not using GitHub pages.
+| Cookie | Type           | Description                                                                                                     |
+| :----- | :------------- | :-------------------------------------------------------------------------------------------------------------- |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to get list of users in their organisation |
 
-See the [`/website`](website/README.md) directory for examples.
+## Running Unit Tests
 
-## Directories You Shouldn't Have
+To run tests, run the following commands.  
+Flush the whole DB before running the tests so that mock data doesn't intersect with the previous data.
 
-### `/src`
+Make sure you are in the root directory of the project where the docker-compose files are present.  
+Start the MySQL server service only if you are using Docker.
 
-Some Go projects do have a `src` folder, but it usually happens when the devs came from the Java world where it's a common pattern. If you can help yourself try not to adopt this Java pattern. You really don't want your Go code or Go projects to look like Java :-)
+```bash
+  docker-compose -f .\docker-compose.yml -f .\docker-compose.dev.yml up -d mysql
+```
 
-Don't confuse the project level `/src` directory with the `/src` directory Go uses for its workspaces as described in [`How to Write Go Code`](https://golang.org/doc/code.html). The `$GOPATH` environment variable points to your (current) workspace (by default it points to `$HOME/go` on non-windows systems). This workspace includes the top level `/pkg`, `/bin` and `/src` directories. Your actual project ends up being a sub-directory under `/src`, so if you have the `/src` directory in your project the project path will look like this: `/some/path/to/workspace/src/your_project/src/your_code.go`. Note that with Go 1.11 it's possible to have your project outside of your `GOPATH`, but it still doesn't mean it's a good idea to use this layout pattern.
+Now run unit tests.  
+Make sure you are in the backend directory where the go.mod file is located.
 
+```bash
+    cd backend
+    go test ./test -v
+```
 
-## Badges
+## Rationale
 
-* [Go Report Card](https://goreportcard.com/) - It will scan your code with `gofmt`, `go vet`, `gocyclo`, `golint`, `ineffassign`, `license` and `misspell`. Replace `github.com/golang-standards/project-layout` with your project reference.
+- **Golang Framework**: GoFiber is a lightweight and fast web framework that is perfect for building APIs. It has a simple and intuitive API that makes it easy to build and maintain APIs. It also has excellent performance and scalability, making it ideal for high-traffic applications.
 
-    [![Go Report Card](https://goreportcard.com/badge/github.com/golang-standards/project-layout?style=flat-square)](https://goreportcard.com/report/github.com/golang-standards/project-layout)
+- **MySQL Database**: MySQL is a popular open-source relational database management system. It is known for its robustness, scalability, and performance. It also has excellent support for ACID transactions, making it ideal for applications that require data consistency and reliability.
 
-* ~~[GoDoc](http://godoc.org) - It will provide online version of your GoDoc generated documentation. Change the link to point to your project.~~
+- **Gorm**: GORM is a powerful and easy-to-use ORM for Golang. It provides a simple and intuitive API for interacting with databases, making it easy to build and maintain database-driven applications. It also has excellent support for MySQL, making it an ideal choice for this project.
 
-    [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/golang-standards/project-layout)
+## DB Design
 
-* [Pkg.go.dev](https://pkg.go.dev) - Pkg.go.dev is a new destination for Go discovery & docs. You can create a badge using the [badge generation tool](https://pkg.go.dev/badge).
+The database will have two tables called "users" and "organisations" that will store the user and organisation details respectively. The tables will have the following columns:
 
-    [![PkgGoDev](https://pkg.go.dev/badge/github.com/golang-standards/project-layout)](https://pkg.go.dev/github.com/golang-standards/project-layout)
+### Users Table
 
-* Release - It will show the latest release number for your project. Change the github link to point to your project.
+| Column Name | Data Type | Description             |
+| :---------- | :-------- | :---------------------- |
+| `id`        | `int`     | Unique ID for each user |
+| `username`  | `string`  | Name of the user        |
+| `password`  | `string`  | Password of the user    |
+| `is_admin`  | `bool`    | Is the user an admin    |
+| `org_id`    | `int`     | ID of the organisation  |
 
-    [![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/golang-standards/project-layout/releases/latest)
+### Organisations Table
 
-## Notes
+| Column Name | Data Type | Description                          |
+| :---------- | :-------- | :----------------------------------- |
+| `id`        | `int`     | Unique ID for each org               |
+| `name`      | `string`  | Name of the organisation             |
+| `head`      | `string`  | Name of the head of the organisation |
 
-A more opinionated project template with sample/reusable configs, scripts and code is a WIP.
+The "id" column will be the primary key for both tables. The "org_id" column in the "users" table will be a foreign key that references the "id" column in the "organisations" table.
+
+The password will be hashed using bcrypt before being stored in the database to ensure security.
+
+## Acknowledgements
+
+- [Dev.to article](https://dev.to/koddr/go-fiber-by-examples-testing-the-application-1ldf)
+- [Golang docs](https://go.dev/doc/)
+- [Golang packages](https://pkg.go.dev/fmt)
+
+## Authors
+
+- [@RohitShah1706](https://github.com/RohitShah1706)
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)

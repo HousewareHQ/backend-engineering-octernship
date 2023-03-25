@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  nginx:
+    ports:
+      - "80:80"
+  
+  go-app:
+    build:
+      context: ./backend
+      args:
+        - NGINX_PORT=8080
+    volumes:
+      - ./backend:/app
+    command: ["go", "run", "cmd/main.go"]
+
+  mysql:
+    environment:
+      - MYSQL_ROOT_PASSWORD=mypassword
+      - MYSQL_DATABASE=mydb
