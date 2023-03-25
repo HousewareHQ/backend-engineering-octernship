@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:stable-alpine
+    volumes:
+      - ./backend/configs/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  mysql:
+    container_name: mysql
+    image: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+
+  go-app:
+    container_name: go-app
+    build: ./backend
+    image: rohitshah1706/go-app
+    depends_on:
+      - nginx
+      - mysql
+volumes:
+  mysql: {}
+    

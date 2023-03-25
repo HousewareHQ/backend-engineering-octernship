@@ -1,99 +1,300 @@
-## Houseware
+# Authorization + Authentication service in Golang using JWT
 
-### Company information 
+<summary><a href="#important-change-to-be-made-before-running">Please check this out before proceeding to installation.</a></summary>
 
-Houseware's vision is to empower the next generation of knowledge workers by putting the data warehouse in their hands, in the language they speak. Houseware is purpose-built for the Data Cloud’s untouched creators, empowering internal apps across organizations. 
+<summary><a href="#important-change-to-be-made-before-running">Did you follow this or not ?</a></summary>
 
-### Why participate in an Octernship with Houseware
+<summary><a href="#important-change-to-be-made-before-running">Error connecting to DB. Follow this.</a></summary>
 
-Houseware is changing the way the data warehouse is leveraged, and we want you to help build Houseware! Our team came together to answer the singular question, "how can we flip the value of the data warehouse to the ones who really need it, to the ones who drive decisions". 
+## Where is the source code ?
 
-In this role, you'll have the opportunity to work as a Backend engineer with the Houseware team on multiple customer-facing projects, the role being intensive in technical architecture and backend engineering. The ability to have a constant pulse on the engineering team’s shipping velocity, while accounting for stability and technical debt looking forward is crucial.
+> `backend/cmd` - contains the main.go file and all the other necessary folders.
 
-### Octernship role description
+> `backend/test` - contains the test code.
 
-We're looking for backend developers to join the Houseware team. 
+## Features
 
-We are hell-bent on building a forward-looking product, something that constantly pushes us to think by first principles and question assumptions, building a team that is agile in adapting and ever curious. While fast-paced execution is one of the prerequisites in this role, equally important is the ability to pause and take stock of where product/engineering is heading from a long-term perspective. Your initiative is another thing that we would expect to shine through here, as you continuously navigate through ambiguous waters while working with vigor on open-ended questions - all to solve problems for and empathize with the end users.
-
-You are expected to own the backend and infrastructure stack end-to-end, understand the business use cases, map it to the best-in-class engineering systems while maintaining a great developer experience. This role involves a high level of attention to detail, debugging and testing skills, as well as long-term thinking with respect to the scalability of our platform. 
-
-
-| Octernship info  | Timelines and Stipend |
-| ------------- | ------------- |
-| Assignment Deadline  | 26 March 2023  |
-| Octernship Duration  | 3-6 Months  |
-| Monthly Stipend  | $600 USD  |
-
-### Recommended qualifications
-
-You’d be a great fit if:
-
-- You’re proficient in Golang and Python, having prior experience building backend systems and hands-on experience with AWS/GCP.
-- You’re familiar with the modern data stack and have a good understanding of Infrastructure-as-code tooling like Terraform.
-- Plus Points if you’re a contributor to open-source, we’d love to see your work!
-
-### Eligibility
-
-To participate, you must be:
-
-* A [verified student](https://education.github.com/discount_requests/pack_application) on Global Campus
-
-* 18 years or older
-
-* Active contributor on GitHub (monthly)
-
-# Assignment
-
-## Implement an Authorization+Authentication service in Golang
-
-### Task instructions
-
-The assignment is to create a backend API service in Golang that handles authorization and authentication for a web app. The details of the web app are as follows:
-- A simple web app where users in an organization can signin and list all other users in their organization
-- Logging in is performed by supplying a `username, password` combination
-- Note that all passwords should be hashed when stored in a database for security purposes
-- For simplicity, assume that the existing users have already been registered and we are not concerned about a user registration flow here.
-- The user should be logged in with a JWT token, with a one hour expiry.
-- The user should be able to receive a new access token using a 'Refresh token' with a validity of 24 hours.
-- The user should be able to logout as well.
-- There are admin privileges assigned to a few users, which gives them the ability to add new user accounts or delete existing user accounts from their organization.
-- All non-admin users should be able to see other user accounts but shouldn't be able to add/delete any user accounts.
-- Note that any user shouldn't be able to view/add/delete user accounts into any other organization.
-
-The API should follow REST API conventions, feel free to design the API structure as you may. The API should cover the following functionalities:
 - User Login
 - User Logout
+- All passwords are hashed before storing in the database.
 - Admin User adds a new User account(by providing the username & password)
 - Admin User deletes an existing User account from their organization
 - List all Users in their organization
+- Admin User adds a new Organization(by providing the organization name & head)
 
-Note: Do add unit tests(for success & failure) for each API endpoint.
+## Architecture / Stack
 
-Provided in this Github template is a Golang Standard repository, you'd have to design an ideal architecture/stack for this problem
-- Golang framework for this API
-- Which Database shall be used to store the user details?
-- The ORM that shall be used for interfacing with the Database
-- DB design
+- Golang framework - [Gofiber](https://pkg.go.dev/github.com/gofiber/fiber@v1.14.6)
+- Database - [MySQL](https://www.mysql.com/)
+- ORM - [GORM](https://pkg.go.dev/gorm.io/gorm@v1.24.6)
+- JWT - [jwt-go](https://pkg.go.dev/github.com/dgrijalva/jwt-go@v3.2.0)
+- Password Hashing - [bcrypt](https://pkg.go.dev/golang.org/x/crypto@v0.7.0/bcrypt)
+- Unit Testing: [Testing package](https://pkg.go.dev/testing)
 
-Do document the design decisions and the rationale behind the same in a README file.
+## Installation
 
-1. Please push your final code changes to your main branch
-2. Please add your instructions/assumptions/any other remarks in the beginning of the Readme file and the reviewers will take a look
-3. The PR created called Feedback will be used for sharing any feedback/asking questions by the reviewers, please make sure you do not close the Feedback PR.
-4. The assignment will be automatically submitted on the "Assignment Deadline" date -- you don't need to do anything apart from what is mentioned above.
-5. Using GitHub Issues to ask any relevant questions regarding the project
+This app requires [Go](https://go.dev/doc/install) v1.20+ to run.  
+Also make sure to install [docker](https://www.docker.com/products/docker-desktop/) and [docker-compose](https://docs.docker.com/compose/install/) for your operating system.
 
-### Task Expectations
+Clone the repository
 
-- Instructions in the Readme to setup the API & the relevant database
-- Postman/Swagger/OpenAPI spec so that the APIs can be tested
-- The task will be evaluated on the: fulfillment of the requirements and correctness of the API responses, in addition to the simplicity & architecture of the solution
+```bash
+  git clone https://github.com/HousewareHQ/houseware---backend-engineering-octernship-RohitShah1706.git
+```
 
-### Task submission
+## Run using go locally.
 
-Students are expected to use the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) when working on their project. 
+Install the dependencies:
 
-1. Making changes on the auto generated `feedback` branch to complete the task
-2. Using the auto generated **Feedback Pull Request** for review and submission
-3. Using GitHub Discussions to ask any relevant questions regarding the project
+```bash
+  cd houseware---backend-engineering-octernship-RohitShah1706/backend
+  go mod download
+```
+
+Run the application
+
+```bash
+  go run cmd/main.go
+```
+
+This will start the dev server on port 8080.
+
+## Or run using docker in dev environment
+
+We will use the following docker images along with our own go-app image  
+| Plugin | Links |
+| ------ | ------ |
+| Nginx | https://hub.docker.com/_/nginx |
+| MYSQL | https://hub.docker.com/_/mysql |
+| Golang | https://hub.docker.com/_/golang |
+
+Build required docker images and start the container.
+
+```bash
+  docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+
+This will automatically start the go-app on port 8080 if in dev mode.  
+If in prod mod it will start the server on port 80 TCP.
+
+This docker-compose file sets up a basic web application with three services:  
+| Container | Role |
+| ------ | ------ |
+| go-app | Handles the main login for running the app. |
+| nginx | Acts as a reverse proxy to the go-app service, so incoming traffic to the application can be efficiently directed to the appropriate service. Can also act as a load-balancer to distribute requests across multiple instances of the go-app service. |
+| mysql | Runs MySQL database and creates a persistent volume for data storage. This way your data persists even after tearing down the containers. |
+
+This setup provides a scalable and easily deployable web application architecture that can be customized further according to specific requirements.
+
+## Environment Variables
+
+To run this application, you will need to add the following environment variables to your .env file.  
+For development mode the `.env` file is present in backend directory.
+
+`SECRET_KEY`
+
+`NGINX_PORT`
+
+`DB_USERNAME`
+
+`DB_PASSWORD`
+
+`DB_HOST`
+
+`DB_PORT`
+
+`DB_NAME`
+
+`ADMIN_ORG_NAME`
+
+`ADMIN_ORG_HEAD`
+
+`ADMIN_USERNAME`
+
+`ADMIN_PASSWORD`
+
+## Important change to be made before running
+
+> `DB_HOST` in `.env` file should be localhost if running the app using go command.  
+> `DB_HOST` in `.env` file should be `mysql` or whatever is the name of your MySQL service so that docker's internal dns will replace with the appropriate IP Address.
+
+## Postman API Reference
+
+> [Postman API access](https://elements.getpostman.com/redirect?entityId=20239076-994ff5e1-5715-49b9-a59e-d3f84e2f3c78&entityType=collection) - all the endpoints are here for your direct testing.
+
+### Admin endpoints - protected with isAdminCheck middleware
+
+#### Create Organisation
+
+```http
+  POST /api/org
+```
+
+| Body   | Type     | Description                                   |
+| :----- | :------- | :-------------------------------------------- |
+| `name` | `string` | **Required** Name of the organisation         |
+| `head` | `string` | **Required** Name of the head of organisation |
+
+#### Delete Organisation
+
+```http
+  DELETE /api/org
+```
+
+| Body   | Type     | Description                           |
+| :----- | :------- | :------------------------------------ |
+| `name` | `string` | **Required** Name of the organisation |
+
+#### Update Organisation details
+
+```http
+  PATCH /api/org
+```
+
+| Body   | Type     | Description                                       |
+| :----- | :------- | :------------------------------------------------ |
+| `name` | `string` | **Required** Name of the organisation             |
+| `head` | `string` | **Required** Name of the new head of organisation |
+
+#### Create User Account
+
+```http
+  POST /api/auth
+```
+
+| Body       | Type     | Description                                                       |
+| :--------- | :------- | :---------------------------------------------------------------- |
+| `username` | `string` | **Required** Name of the user                                     |
+| `password` | `string` | **Required** Password that will be hashed while storing in the DB |
+| `org_id`   | `string` | **Required** Organisation the user belongs to                     |
+
+#### Delete User Account
+
+```http
+  DELETE /api/auth
+```
+
+| Body       | Type     | Description                   |
+| :--------- | :------- | :---------------------------- |
+| `username` | `string` | **Required** Name of the user |
+
+### User endpoints - public
+
+#### Login to account - will create a new JWT token with expiry time of 1 hour
+
+```http
+  POST /api/auth/login
+```
+
+| Body       | Type     | Description                       |
+| :--------- | :------- | :-------------------------------- |
+| `username` | `string` | **Required** Name of the user     |
+| `password` | `string` | **Required** Password of the user |
+
+#### Refresh access token - grants a new acces token with an expiry time of 24 hours
+
+```http
+  POST /api/auth/refresh
+```
+
+| Cookie | Type           | Description                                                                                       |
+| :----- | :------------- | :------------------------------------------------------------------------------------------------ |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to refresh the current token |
+
+#### Get user account
+
+```http
+  GET /api/auth/user
+```
+
+| Cookie | Type           | Description                                                                                       |
+| :----- | :------------- | :------------------------------------------------------------------------------------------------ |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to get their account details |
+
+#### Logout
+
+```http
+  GET /api/auth/logout
+```
+
+| Cookie | Type           | Description                                                                    |
+| :----- | :------------- | :----------------------------------------------------------------------------- |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to logout |
+
+#### Get people in same organisation
+
+```http
+  GET /api/org
+```
+
+| Cookie | Type           | Description                                                                                                     |
+| :----- | :------------- | :-------------------------------------------------------------------------------------------------------------- |
+| `jwt`  | `access token` | **Required** Users should be logged in and have a valid access token to get list of users in their organisation |
+
+## Running Unit Tests
+
+To run tests, run the following commands.  
+Flush the whole DB before running the tests so that mock data doesn't intersect with the previous data.
+
+Make sure you are in the root directory of the project where the docker-compose files are present.  
+Start the MySQL server service only if you are using Docker.
+
+```bash
+  docker-compose -f .\docker-compose.yml -f .\docker-compose.dev.yml up -d mysql
+```
+
+Now run unit tests.  
+Make sure you are in the backend directory where the go.mod file is located.
+
+```bash
+    cd backend
+    go test ./test -v
+```
+
+## Rationale
+
+- **Golang Framework**: GoFiber is a lightweight and fast web framework that is perfect for building APIs. It has a simple and intuitive API that makes it easy to build and maintain APIs. It also has excellent performance and scalability, making it ideal for high-traffic applications.
+
+- **MySQL Database**: MySQL is a popular open-source relational database management system. It is known for its robustness, scalability, and performance. It also has excellent support for ACID transactions, making it ideal for applications that require data consistency and reliability.
+
+- **Gorm**: GORM is a powerful and easy-to-use ORM for Golang. It provides a simple and intuitive API for interacting with databases, making it easy to build and maintain database-driven applications. It also has excellent support for MySQL, making it an ideal choice for this project.
+
+## DB Design
+
+The database will have two tables called "users" and "organisations" that will store the user and organisation details respectively. The tables will have the following columns:
+
+### Users Table
+
+| Column Name | Data Type | Description             |
+| :---------- | :-------- | :---------------------- |
+| `id`        | `int`     | Unique ID for each user |
+| `username`  | `string`  | Name of the user        |
+| `password`  | `string`  | Password of the user    |
+| `is_admin`  | `bool`    | Is the user an admin    |
+| `org_id`    | `int`     | ID of the organisation  |
+
+### Organisations Table
+
+| Column Name | Data Type | Description                          |
+| :---------- | :-------- | :----------------------------------- |
+| `id`        | `int`     | Unique ID for each org               |
+| `name`      | `string`  | Name of the organisation             |
+| `head`      | `string`  | Name of the head of the organisation |
+
+The "id" column will be the primary key for both tables. The "org_id" column in the "users" table will be a foreign key that references the "id" column in the "organisations" table.
+
+The password will be hashed using bcrypt before being stored in the database to ensure security.
+
+## Acknowledgements
+
+- [Dev.to article](https://dev.to/koddr/go-fiber-by-examples-testing-the-application-1ldf)
+- [Golang docs](https://go.dev/doc/)
+- [Golang packages](https://pkg.go.dev/fmt)
+
+## Authors
+
+- [@RohitShah1706](https://github.com/RohitShah1706)
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
