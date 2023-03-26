@@ -1,99 +1,134 @@
-## Houseware
+# Authentication and Authorization service in GoLang using JWT
 
-### Company information 
+## Tech Stack
+- GoLang Framework: [`Gin`](https://gin-gonic.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [Mongo Go Driver](https://www.mongodb.com/docs/drivers/go/current/)
 
-Houseware's vision is to empower the next generation of knowledge workers by putting the data warehouse in their hands, in the language they speak. Houseware is purpose-built for the Data Cloud’s untouched creators, empowering internal apps across organizations. 
+### Reason for choosing Tech Stack: 
+- Gin is a great choice for building web applications in Go, especially scalability. Gin has a small footprint, making it easy to build and deploy applications quickly. Gin has a simple and intuitive API, making it easy to learn and use even for beginners. The reason for choosing a framework was to make the code more faster and easier to read and understand and also that gorilla mux is outdated and not maintained anymore.
 
-### Why participate in an Octernship with Houseware
+- Mongodb: as it is a NoSQL document database, it is very easy to scale and also it is very fast and efficient. It is also very easy to use and understand. It is also very easy to integrate with GoLang.
+- mongo-go-driver: it is the official Go driver for MongoDB. It is very easy to use and understand and also it is very fast and efficient.
 
-Houseware is changing the way the data warehouse is leveraged, and we want you to help build Houseware! Our team came together to answer the singular question, "how can we flip the value of the data warehouse to the ones who really need it, to the ones who drive decisions". 
-
-In this role, you'll have the opportunity to work as a Backend engineer with the Houseware team on multiple customer-facing projects, the role being intensive in technical architecture and backend engineering. The ability to have a constant pulse on the engineering team’s shipping velocity, while accounting for stability and technical debt looking forward is crucial.
-
-### Octernship role description
-
-We're looking for backend developers to join the Houseware team. 
-
-We are hell-bent on building a forward-looking product, something that constantly pushes us to think by first principles and question assumptions, building a team that is agile in adapting and ever curious. While fast-paced execution is one of the prerequisites in this role, equally important is the ability to pause and take stock of where product/engineering is heading from a long-term perspective. Your initiative is another thing that we would expect to shine through here, as you continuously navigate through ambiguous waters while working with vigor on open-ended questions - all to solve problems for and empathize with the end users.
-
-You are expected to own the backend and infrastructure stack end-to-end, understand the business use cases, map it to the best-in-class engineering systems while maintaining a great developer experience. This role involves a high level of attention to detail, debugging and testing skills, as well as long-term thinking with respect to the scalability of our platform. 
-
-
-| Octernship info  | Timelines and Stipend |
-| ------------- | ------------- |
-| Assignment Deadline  | 26 March 2023  |
-| Octernship Duration  | 3-6 Months  |
-| Monthly Stipend  | $600 USD  |
-
-### Recommended qualifications
-
-You’d be a great fit if:
-
-- You’re proficient in Golang and Python, having prior experience building backend systems and hands-on experience with AWS/GCP.
-- You’re familiar with the modern data stack and have a good understanding of Infrastructure-as-code tooling like Terraform.
-- Plus Points if you’re a contributor to open-source, we’d love to see your work!
-
-### Eligibility
-
-To participate, you must be:
-
-* A [verified student](https://education.github.com/discount_requests/pack_application) on Global Campus
-
-* 18 years or older
-
-* Active contributor on GitHub (monthly)
-
-# Assignment
-
-## Implement an Authorization+Authentication service in Golang
-
-### Task instructions
-
-The assignment is to create a backend API service in Golang that handles authorization and authentication for a web app. The details of the web app are as follows:
-- A simple web app where users in an organization can signin and list all other users in their organization
-- Logging in is performed by supplying a `username, password` combination
-- Note that all passwords should be hashed when stored in a database for security purposes
-- For simplicity, assume that the existing users have already been registered and we are not concerned about a user registration flow here.
-- The user should be logged in with a JWT token, with a one hour expiry.
-- The user should be able to receive a new access token using a 'Refresh token' with a validity of 24 hours.
-- The user should be able to logout as well.
-- There are admin privileges assigned to a few users, which gives them the ability to add new user accounts or delete existing user accounts from their organization.
-- All non-admin users should be able to see other user accounts but shouldn't be able to add/delete any user accounts.
-- Note that any user shouldn't be able to view/add/delete user accounts into any other organization.
-
-The API should follow REST API conventions, feel free to design the API structure as you may. The API should cover the following functionalities:
-- User Login
-- User Logout
+## Features
+- User/Admin Login
+- User/Admin Logout
 - Admin User adds a new User account(by providing the username & password)
 - Admin User deletes an existing User account from their organization
 - List all Users in their organization
+- Passwords are hashed using bcrypt
 
-Note: Do add unit tests(for success & failure) for each API endpoint.
 
-Provided in this Github template is a Golang Standard repository, you'd have to design an ideal architecture/stack for this problem
-- Golang framework for this API
-- Which Database shall be used to store the user details?
-- The ORM that shall be used for interfacing with the Database
-- DB design
+## Installation
+This app requires go 1.19+ to run.
 
-Do document the design decisions and the rationale behind the same in a README file.
+Clone the repository
+and run this command 
+```sh
+make run 
+```
+this will start the server on port 8080 (the .env file is already present in the repo for the simplicity to run and check the program and can alter the .env file according to your needs)
 
-1. Please push your final code changes to your main branch
-2. Please add your instructions/assumptions/any other remarks in the beginning of the Readme file and the reviewers will take a look
-3. The PR created called Feedback will be used for sharing any feedback/asking questions by the reviewers, please make sure you do not close the Feedback PR.
-4. The assignment will be automatically submitted on the "Assignment Deadline" date -- you don't need to do anything apart from what is mentioned above.
-5. Using GitHub Issues to ask any relevant questions regarding the project
 
-### Task Expectations
+## API Endpoints Testing
+- [Postman Collection](https://elements.getpostman.com/redirect?entityId=16228609-6328e8f5-b08d-49e6-9a77-3e6aabd24e37&entityType=collection)
 
-- Instructions in the Readme to setup the API & the relevant database
-- Postman/Swagger/OpenAPI spec so that the APIs can be tested
-- The task will be evaluated on the: fulfillment of the requirements and correctness of the API responses, in addition to the simplicity & architecture of the solution
+<br>
 
-### Task submission
+#### Admin Signup
+```http
+  POST /signup
+```
+This endpoint takes username, password and orgid of the admin and returns inserts the data in User Collection and usertoken collection and returns the insertedID of both the collections.
 
-Students are expected to use the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) when working on their project. 
+<br>
 
-1. Making changes on the auto generated `feedback` branch to complete the task
-2. Using the auto generated **Feedback Pull Request** for review and submission
-3. Using GitHub Discussions to ask any relevant questions regarding the project
+
+#### Admin can Add user to the Organisation using username and password
+```http
+  POST /users
+```
+This endpoint takes username, password, token of the admin and returns inserts the data in User Collection and usertoken collection and returns the insertedID of both the collections. using the token orgid is extracted to save the new user in the specified orgid
+
+<br>
+
+#### Admin can Delete the User from the organization using the Userid
+```http
+  DELETE /users/:userid
+```
+This endpoint takes the token and deletes the user of the orgid which is extracted from the token. the userid is extracted from the query parameters.
+
+<br>
+
+#### Logout the user 
+```http
+  POST /logout
+```
+This endpoint takes the accesstoken from the user and removes the accesstoken and refreshtoken from the database so that the user cant access the protected routes.
+
+<br>
+
+#### Login
+```http
+  POST /login
+```
+Endpoint takes in username and password as input and and returns the accesstoken and refreshtoken and all the user details.
+
+<br>
+
+#### Refresh access token 
+```http
+  POST /refresh
+```
+This endpoint takes in the refreshtoken and updates the accesstoken if the refreshtokne hasnt expired yet then.
+
+<br>
+
+#### Get all users in the organization by users or admin 
+```http
+  GET /users
+```
+This endpoint takes the token and extracts the orgID from the token and get all users according to the page and uses mongodb aggregation feature. 
+
+
+<br>
+
+## DB Design
+The Database is designed in such a way that it is very easy to scale and also it is very fast and efficient. The Database has two Collections called Users and UserTokens and the schema is as follows:
+
+<br>
+
+### Users Table:
+
+| Column Name | Data Type | Description                  |
+| :---------- | :-------- | :----------------------      |
+| `id`        | `ObejectId`| Unique ID for each user     |
+| `userid`    | `string`   | User ID for each user       |
+| `username`  | `string`   | username                    |
+| `password`  | `string`   | Password of the user        |
+| `usertype`  | `string`   | Is the user an admin or user|
+| `orgid`     | `string`   | ID of the organisation      |
+| `createdat` | `Date`     | When was the Document created|
+| `updatedat` | `Date`     | When was the Document updated|
+
+### UserTokens Table:
+
+| Column Name     | Data Type | Description                  |
+| :----------     | :-------- | :----------------------      |
+| `id`            | `ObejectId`| Unique ID for each user     |
+| `userid`        | `string`   | User ID for each user       |
+| `accesstoken`   | `string`   | Access token with 1hr validity|
+| `refreshtoken`  | `string`   | Access token with 24hrs validity|
+| `createdat`     | `Date`     | When was the document created|
+| `updatedat`     | `Date`     | When was the document updated|
+
+<br>
+
+This schema makes the database scalable and seperates the tokens collection from the user collection.
+
+### NOTE: Unit Tests were added only for two routes couldnt find a standard way and logic to test the rest of the routes, But have added error handling in detail for any failure. :(
+
+## Authors
+
+- [@shreykhandelwal](https://github.com/HawkingRadiation42)
