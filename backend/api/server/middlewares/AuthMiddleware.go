@@ -21,6 +21,7 @@ func SessionAuthentication() gin.HandlerFunc {
 			storedToken = ctx.Request.Header.Get("Authorization") //TO GET TOKEN USING HEADER
 
 		}
+
 		//TRY:Validating access-token
 		_, validTokenErr := helpers.ValidateJWTToken(storedToken)
 		defer cancel()
