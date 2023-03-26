@@ -94,14 +94,12 @@ Provided in this Github template is a Golang Standard repository, you'd have to 
 
 Do document the design decisions and the rationale behind the same in a README file.
 
-<<<<<<< HEAD
-=======
 1. Please push your final code changes to your main branch
 2. Please add your instructions/assumptions/any other remarks in the beginning of the Readme file and the reviewers will take a look
 3. The PR created called Feedback will be used for sharing any feedback/asking questions by the reviewers, please make sure you do not close the Feedback PR.
 4. The assignment will be automatically submitted on the "Assignment Deadline" date -- you don't need to do anything apart from what is mentioned above.
 5. Using GitHub Issues to ask any relevant questions regarding the project
->>>>>>> 256a04ee6578312fc0f3a3d3bfa3ba8603534d9b
+
 
 ### Task Expectations
 
