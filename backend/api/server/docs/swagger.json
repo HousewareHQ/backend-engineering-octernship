@@ -1,0 +1,396 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {
+            "name": "Pranay Payal",
+            "url": "https://www.linkedin.com/in/pranay-payal-b6b0161b1/",
+            "email": "kewinlee123@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "paths": {
+        "/login": {
+            "post": {
+                "description": "Login user and create new session(assigns access-token \u0026 refresh-token to user)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication Endpoints"
+                ],
+                "summary": "Login User",
+                "operationId": "Authentication",
+                "parameters": [
+                    {
+                        "description": "User Credentials",
+                        "name": "login-request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        },
+                        "headers": {
+                            "Set-Cookie": {
+                                "type": "string",
+                                "description": "accesstoken+refreshtoken"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "Logout user and Destroys user's session by expiring tokens cookie",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication Endpoints"
+                ],
+                "summary": "Logout User",
+                "operationId": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "Set-Cookie": {
+                                "type": "string",
+                                "description": "(accesstoken+refreshtoken)-expired"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/refresh-rotate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ],
+                "description": "Returns and assigns new access-token and refresh-token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication Endpoints"
+                ],
+                "summary": "Refresh Token Rotate",
+                "operationId": "RefreshTokenRotate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Send token using Cookie header\u003cbr\u003e(Example:Cookie:refreshtoken=eyJhbGciOiJ..)",
+                        "name": "Cookie",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RefreshRotateResponse"
+                        },
+                        "headers": {
+                            "Set-Cookie": {
+                                "type": "string",
+                                "description": "accesstoken+refreshtoken"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ],
+                "description": "Returns All Users in current user's organization,omits security sensitive fields",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access Users inventory"
+                ],
+                "summary": "Get All User's List",
+                "operationId": "GetAllUsers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Send tokens using Cookie header\u003cbr\u003e(Example:Cookie: accesstoken=eyJhbGc..; refreshtoken=eyJhbGciOiJ..)",
+                        "name": "Cookie",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/create-user": {
+            "post": {
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ],
+                "description": "Creates user in same organization as current user,returns insertion number.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access Users inventory"
+                ],
+                "summary": "Create user.[ADMIN AUTHORIZED ONLY]",
+                "operationId": "CreateUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Send tokens using Cookie header\u003cbr\u003e(Example:Cookie: accesstoken=eyJhbGc..; refreshtoken=eyJhbGciOiJ..)",
+                        "name": "Cookie",
+                        "in": "header"
+                    },
+                    {
+                        "description": "(Username:min 3 to max 15 char.Password:min 4 char).\u003cbr\u003eFOR API TESTING Only:To override create user inorder to create user in different org. pass a third param 'org'.",
+                        "name": "create-user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUserBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/delete/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiToken": []
+                    }
+                ],
+                "description": "Deletes user by id in same organization as current user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access Users inventory"
+                ],
+                "summary": "Delete user by id,if exists.[ADMIN AUTHORIZED ONLY]",
+                "operationId": "DeleteUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Send tokens using Cookie header\u003cbr\u003e(Example:Cookie: accesstoken=eyJhbGc..; refreshtoken=eyJhbGciOiJ..)",
+                        "name": "Cookie",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID of user",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.CreateUserBody": {
+            "type": "object",
+            "required": [
+                "password",
+                "username",
+                "usertype"
+            ],
+            "properties": {
+                "password": {
+                    "description": "The Password of a user\nexample: abcde",
+                    "type": "string",
+                    "minLength": 4,
+                    "example": "pass123"
+                },
+                "username": {
+                    "description": "The Username of a user\nexample: \"pranay\"",
+                    "type": "string",
+                    "maxLength": 15,
+                    "minLength": 3,
+                    "example": "userABC"
+                },
+                "usertype": {
+                    "description": "The Usertype of a user\nexample: \"USER\" || \"ADMIN\"",
+                    "type": "string",
+                    "example": "{'USER'/'ADMIN'}"
+                }
+            }
+        },
+        "models.CreateUserResponse": {
+            "type": "object",
+            "properties": {
+                "result_insertion_number": {
+                    "description": "The insertion number of new user",
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginRequestBody": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "The Password of a user\nexample: \"pranay\"",
+                    "type": "string",
+                    "minLength": 4,
+                    "example": "pass123"
+                },
+                "username": {
+                    "description": "The Username of a user\nexample: \"pranay\"",
+                    "type": "string",
+                    "maxLength": 15,
+                    "minLength": 3,
+                    "example": "userABC"
+                }
+            }
+        },
+        "models.RefreshRotateResponse": {
+            "type": "object",
+            "properties": {
+                "jwttoken": {
+                    "description": "The jwttoken of a user",
+                    "type": "string"
+                },
+                "refreshtoken": {
+                    "description": "The refreshtoken of a user",
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "required": [
+                "password",
+                "username",
+                "usertype"
+            ],
+            "properties": {
+                "createdon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jwttoken": {
+                    "type": "string"
+                },
+                "org": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 4
+                },
+                "refreshtoken": {
+                    "type": "string"
+                },
+                "updatedon": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "minLength": 3
+                },
+                "usertype": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiToken": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

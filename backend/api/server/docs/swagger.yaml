@@ -1,0 +1,282 @@
+definitions:
+  models.CreateUserBody:
+    properties:
+      password:
+        description: |-
+          The Password of a user
+          example: abcde
+        example: pass123
+        minLength: 4
+        type: string
+      username:
+        description: |-
+          The Username of a user
+          example: "pranay"
+        example: userABC
+        maxLength: 15
+        minLength: 3
+        type: string
+      usertype:
+        description: |-
+          The Usertype of a user
+          example: "USER" || "ADMIN"
+        example: '{''USER''/''ADMIN''}'
+        type: string
+    required:
+    - password
+    - username
+    - usertype
+    type: object
+  models.CreateUserResponse:
+    properties:
+      result_insertion_number:
+        description: The insertion number of new user
+        type: string
+    type: object
+  models.LoginRequestBody:
+    properties:
+      password:
+        description: |-
+          The Password of a user
+          example: "pranay"
+        example: pass123
+        minLength: 4
+        type: string
+      username:
+        description: |-
+          The Username of a user
+          example: "pranay"
+        example: userABC
+        maxLength: 15
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.RefreshRotateResponse:
+    properties:
+      jwttoken:
+        description: The jwttoken of a user
+        type: string
+      refreshtoken:
+        description: The refreshtoken of a user
+        type: string
+    type: object
+  models.User:
+    properties:
+      createdon:
+        type: string
+      id:
+        type: string
+      jwttoken:
+        type: string
+      org:
+        type: string
+      password:
+        minLength: 4
+        type: string
+      refreshtoken:
+        type: string
+      updatedon:
+        type: string
+      username:
+        maxLength: 15
+        minLength: 3
+        type: string
+      usertype:
+        type: string
+    required:
+    - password
+    - username
+    - usertype
+    type: object
+info:
+  contact:
+    email: kewinlee123@gmail.com
+    name: Pranay Payal
+    url: https://www.linkedin.com/in/pranay-payal-b6b0161b1/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /login:
+    post:
+      description: Login user and create new session(assigns access-token & refresh-token
+        to user)
+      operationId: Authentication
+      parameters:
+      - description: User Credentials
+        in: body
+        name: login-request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              description: accesstoken+refreshtoken
+              type: string
+          schema:
+            $ref: '#/definitions/models.User'
+        "500":
+          description: Internal Server Error
+      summary: Login User
+      tags:
+      - Authentication Endpoints
+  /logout:
+    post:
+      description: Logout user and Destroys user's session by expiring tokens cookie
+      operationId: Logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              description: (accesstoken+refreshtoken)-expired
+              type: string
+        "500":
+          description: Internal Server Error
+      summary: Logout User
+      tags:
+      - Authentication Endpoints
+  /refresh-rotate:
+    post:
+      description: Returns and assigns new access-token and refresh-token
+      operationId: RefreshTokenRotate
+      parameters:
+      - description: Send token using Cookie header<br>(Example:Cookie:refreshtoken=eyJhbGciOiJ..)
+        in: header
+        name: Cookie
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              description: accesstoken+refreshtoken
+              type: string
+          schema:
+            $ref: '#/definitions/models.RefreshRotateResponse'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiToken: []
+      summary: Refresh Token Rotate
+      tags:
+      - Authentication Endpoints
+  /users:
+    get:
+      description: Returns All Users in current user's organization,omits security
+        sensitive fields
+      operationId: GetAllUsers
+      parameters:
+      - description: 'Send tokens using Cookie header<br>(Example:Cookie: accesstoken=eyJhbGc..;
+          refreshtoken=eyJhbGciOiJ..)'
+        in: header
+        name: Cookie
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiToken: []
+      summary: Get All User's List
+      tags:
+      - Access Users inventory
+  /users/create-user:
+    post:
+      description: Creates user in same organization as current user,returns insertion
+        number.
+      operationId: CreateUser
+      parameters:
+      - description: 'Send tokens using Cookie header<br>(Example:Cookie: accesstoken=eyJhbGc..;
+          refreshtoken=eyJhbGciOiJ..)'
+        in: header
+        name: Cookie
+        type: string
+      - description: (Username:min 3 to max 15 char.Password:min 4 char).<br>FOR API
+          TESTING Only:To override create user inorder to create user in different
+          org. pass a third param 'org'.
+        in: body
+        name: create-user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateUserResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiToken: []
+      summary: Create user.[ADMIN AUTHORIZED ONLY]
+      tags:
+      - Access Users inventory
+  /users/delete/{id}:
+    delete:
+      description: Deletes user by id in same organization as current user
+      operationId: DeleteUser
+      parameters:
+      - description: 'Send tokens using Cookie header<br>(Example:Cookie: accesstoken=eyJhbGc..;
+          refreshtoken=eyJhbGciOiJ..)'
+        in: header
+        name: Cookie
+        type: string
+      - description: ID of user
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiToken: []
+      summary: Delete user by id,if exists.[ADMIN AUTHORIZED ONLY]
+      tags:
+      - Access Users inventory
+securityDefinitions:
+  ApiToken:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -1,5 +1,21 @@
-## Houseware
+# Organization's API (Authentication+Authorization)
 
+## **Please Refer README.md files in <br> '/backend' - Setting up backend and frontend. <br> '/backend/api'-Getting started with testing API. <br> '/backend/web/app'-Getting started with web client.<br> Directories to get started with setting up and testing the assignment project.**
+© 2023 github.com/thepranays. All rights reserved.
+
+---
+
+
+---
+
+
+
+
+
+
+
+[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=10472174&assignment_repo_type=AssignmentRepo)
+## Houseware
 ### Company information 
 
 Houseware's vision is to empower the next generation of knowledge workers by putting the data warehouse in their hands, in the language they speak. Houseware is purpose-built for the Data Cloud’s untouched creators, empowering internal apps across organizations. 
@@ -83,6 +99,7 @@ Do document the design decisions and the rationale behind the same in a README f
 3. The PR created called Feedback will be used for sharing any feedback/asking questions by the reviewers, please make sure you do not close the Feedback PR.
 4. The assignment will be automatically submitted on the "Assignment Deadline" date -- you don't need to do anything apart from what is mentioned above.
 5. Using GitHub Issues to ask any relevant questions regarding the project
+
 
 ### Task Expectations
 
